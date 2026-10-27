@@ -1671,9 +1671,15 @@ const PIC_EN = {
 
 /* 中英文朗读：先中文后英文，用系统自带的语音合成（防哑火 + 低间隔版） */
 let vZh = null, vEn = null, spkTimer = null, spkSeq = 0, spkStartAt = 0;
+// 安全读写本地存储：沙盒 iframe / 隐私模式下 localStorage 会直接抛 SecurityError，
+// 一旦不管，就会把整段脚本打断，导致导航、调色盘、图案全部渲染不出来
+const store = {
+  get(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+};
 // 连读模式：中文和英文合成一句读完，中间没有换语音的停顿。默认关闭（双语音发音更标准），
 // 只有家长在意节奏时再手动打开
-let joinMode = localStorage.getItem("ct_join") === "1";
+let joinMode = store.get("ct_join") === "1";
 function loadVoices() {
   if (!("speechSynthesis" in window)) return;
   const vs = speechSynthesis.getVoices();
@@ -1939,7 +1945,7 @@ const btnJoin = document.getElementById("btnJoin");
 btnJoin.classList.toggle("on", joinMode);
 btnJoin.onclick = () => {
   joinMode = !joinMode;
-  localStorage.setItem("ct_join", joinMode ? "1" : "0");
+  store.set("ct_join", joinMode ? "1" : "0");
   btnJoin.classList.toggle("on", joinMode);
   speakZhEn(joinMode ? "连读开" : "双语音", joinMode ? "Joined" : "Two voices");
 };
