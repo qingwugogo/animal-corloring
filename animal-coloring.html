@@ -1671,8 +1671,9 @@ const PIC_EN = {
 
 /* 中英文朗读：先中文后英文，用系统自带的语音合成（防哑火 + 低间隔版） */
 let vZh = null, vEn = null, spkTimer = null, spkSeq = 0, spkStartAt = 0;
-// 连读模式：中文和英文合成一句读完，彻底消除换语音造成的中途停顿（默认开，可点按钮关掉）
-let joinMode = localStorage.getItem("ct_join") !== "0";
+// 连读模式：中文和英文合成一句读完，中间没有换语音的停顿。默认关闭（双语音发音更标准），
+// 只有家长在意节奏时再手动打开
+let joinMode = localStorage.getItem("ct_join") === "1";
 function loadVoices() {
   if (!("speechSynthesis" in window)) return;
   const vs = speechSynthesis.getVoices();
@@ -1709,10 +1710,10 @@ function speakZhEn(zh, en) {
     }
     const go = () => {
       if (my !== spkSeq) return;
-      if (joinMode && vZh) {
-        // 连读：中文 + 英文合成一句，由一个语音一口气读完，中间没有任何换语音的停顿
-        const u = new SpeechSynthesisUtterance(zh + " " + en);
-        u.lang = "zh-CN"; u.rate = 1.12;
+      // 连读只用于单词/短语；成句的英文（底部提示等）仍交给英文发音人，避免中文音硬读英文句子变怪音
+      if (joinMode && vZh && en.length <= 24) {
+        const u = new SpeechSynthesisUtterance(zh + "，" + en);
+        u.lang = "zh-CN"; u.rate = 1.05;
         u.voice = vZh;
         u.onstart = () => { if (my === spkSeq) spkStartAt = Date.now(); };
         speechSynthesis.speak(u);
