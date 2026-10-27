@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="GCfx6vgb2ThU8I6YqxioxG">
+<head data-page-node-id="HT8G2B32U6qeE5tQYclvzW">
+<meta charset="UTF-8" data-page-node-id="wW069hxYdIAroTexYwmFBZ">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="93ZoQ7ZsZfkYCM0rWb6MSA">
+<title>🎨 涂色乐园</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: "Comic Sans MS", "Chalkboard SE", "PingFang SC", sans-serif;
+    background: linear-gradient(160deg, #ffe9f0 0%, #e3f2ff 50%, #fff7d6 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    user-select: none;
+  }
+  h1 {
+    font-size: clamp(22px, 4vw, 34px);
+    color: #ff6b9d;
+    text-shadow: 2px 2px 0 #fff;
+    margin-bottom: 10px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: transform .15s;
+  }
+  h1:hover { transform: scale(1.05); }
+  .t-speaker { font-size: .55em; vertical-align: middle; opacity: .75; animation: soundPulse 1.6s ease-in-out infinite; display: inline-block; }
+  @keyframes soundPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+  }
+  .nav {
+    background: #fff;
+    border-radius: 24px;
+    padding: 12px 16px 14px;
+    box-shadow: 0 6px 18px rgba(110, 90, 160, .12);
+    margin-bottom: 14px;
+    max-width: 1000px;
+    width: 100%;
+  }
+  .cats { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .cat-btn {
+    display: flex; align-items: center; gap: 8px;
+    border: none; background: #f1f3f5; border-radius: 999px;
+    padding: 7px 20px 7px 8px; font-size: 16px; font-family: inherit;
+    color: #6b7076; cursor: pointer; transition: all .18s;
+  }
+  .cat-btn .ico {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; line-height: 1; flex: none;
+  }
+  .cat-btn:hover { transform: translateY(-2px); }
+  .cat-btn.active {
+    background: var(--c); color: #fff; font-weight: bold;
+    box-shadow: 0 5px 14px var(--c);
+  }
+  .cat-btn.active .ico { background: rgba(255,255,255,.3); }
+  .subs { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; width: fit-content; margin: 11px auto 0; border-radius: 999px; padding: 4px 6px; }
+  .subs:empty { display: none; }
+  .sub-btn {
+    border: none; background: transparent; border-radius: 999px;
+    padding: 5px 18px; font-size: 14px; font-family: inherit; color: #6b7076;
+    cursor: pointer; transition: all .18s;
+  }
+  .sub-btn:hover { transform: translateY(-1px); }
+  .sub-btn.active { background: var(--c); color: #fff; font-weight: bold; box-shadow: 0 3px 9px var(--c); }
+  .pics { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 4px 0 16px; width: 100%; max-width: 1000px; }
+  .pic-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    border: 3px solid transparent; background: #fff; border-radius: 18px;
+    padding: 6px 6px 4px; font-family: inherit; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(110, 90, 160, .10);
+    transition: all .18s;
+    position: relative;
+  }
+  .pic-btn .spk {
+    position: absolute; top: 9px; right: 9px; z-index: 2;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(255,255,255,.88); box-shadow: 0 1px 4px rgba(0,0,0,.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; line-height: 1; cursor: pointer;
+    transition: transform .12s;
+  }
+  .pic-btn .spk:hover { transform: scale(1.2); }
+  .pic-btn .thumb { width: 86px; height: 64px; border-radius: 12px; overflow: hidden; background: #fff; pointer-events: none; }
+  .pic-btn .thumb svg { width: 86px; height: 64px; display: block; }
+  .pic-btn .plabel { font-size: 13px; color: #666; line-height: 1.2; pointer-events: none; }
+  .pic-btn:hover { transform: translateY(-3px); }
+  .pic-btn.active { border-color: var(--c); box-shadow: 0 5px 14px var(--c); }
+  .pic-btn.active .plabel { color: var(--c); font-weight: bold; }
+  .main { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; align-items: flex-start; width: 100%; max-width: 1100px; }
+  .canvas-box {
+    background: #fff;
+    border-radius: 24px;
+    border: 4px solid #d0e7ff;
+    box-shadow: 0 8px 20px rgba(80,140,255,.15);
+    padding: 10px;
+    position: relative;
+    flex: 1 1 500px;
+    max-width: 680px;
+  }
+  svg#board { width: 100%; height: auto; display: block; border-radius: 16px; }
+  svg#board .rg { cursor: crosshair; transition: fill .12s; }
+  .tools {
+    flex: 0 1 300px;
+    background: #fff;
+    border-radius: 24px;
+    border: 4px solid #ffe1a8;
+    box-shadow: 0 8px 20px rgba(255,180,60,.18);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .current { display: flex; align-items: center; gap: 10px; font-size: 16px; color: #555; }
+  #curColor {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 3px #ccc;
+    background: #ff6b9d;
+  }
+  .palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .swatch {
+    width: 100%; aspect-ratio: 1; border-radius: 50%;
+    border: 3px solid rgba(0,0,0,.08);
+    cursor: pointer;
+    transition: transform .12s;
+  }
+  .swatch:hover { transform: scale(1.18); }
+  .swatch.active { transform: scale(1.18); box-shadow: 0 0 0 3px #555; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tool-btn {
+    flex: 1 1 40%;
+    border: none;
+    border-radius: 14px;
+    padding: 10px 8px;
+    font-size: 15px;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    transition: transform .12s, filter .12s;
+  }
+  .tool-btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+  #btnEraser { background: #9aa5b1; }
+  #btnEraser.on { background: #ff8787; box-shadow: 0 0 0 3px #ffd0d0; }
+  #btnUndo { background: #ffa94d; }
+  #btnClear { background: #ff6b6b; }
+  #btnSave { background: #51cf66; flex: 1 1 100%; font-size: 17px; }
+  #btnSound { background: #748ffc; }
+  .tip { font-size: 13px; color: #999; text-align: center; cursor: pointer; user-select: none; }
+  .tip:hover { color: #666; }
+  .sparkle {
+    position: fixed; pointer-events: none; font-size: 18px;
+    animation: pop .7s ease-out forwards; z-index: 99;
+  }
+  @keyframes pop {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+  @media (max-width: 860px) {
+    .tools { flex: 1 1 100%; max-width: 680px; }
+    .canvas-box { flex: 1 1 100%; }
+  }
+  @media (max-width: 560px) {
+    body { padding: 10px; }
+    h1 { font-size: 22px; margin-bottom: 8px; }
+    .nav { padding: 9px 8px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .cats { gap: 6px; }
+    .cat-btn { padding: 5px 12px 5px 5px; font-size: 14px; gap: 6px; }
+    .cat-btn .ico { width: 27px; height: 27px; font-size: 15px; }
+    .subs { margin-top: 8px; padding: 3px 4px; }
+    .sub-btn { padding: 4px 13px; font-size: 13px; }
+    .pics { gap: 7px; margin-bottom: 12px; }
+    .pic-btn { border-width: 2px; padding: 4px 4px 3px; border-radius: 14px; }
+    .pic-btn .thumb, .pic-btn .thumb svg { width: 66px; height: 50px; }
+    .pic-btn .plabel { font-size: 11px; }
+    .canvas-box { padding: 6px; border-radius: 20px; }
+    .tools { padding: 12px; border-radius: 20px; gap: 10px; }
+    .palette { gap: 6px; }
+    .current { font-size: 14px; }
+    #curColor { width: 34px; height: 34px; }
+  }
+  @media (max-width: 430px) {
+    .cats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .cat-btn { justify-content: center; padding: 6px 8px; }
+  }
+</style>
+</head>
+<body data-page-node-id="hFtFMYEp3rs8HDFcH24Xcs">
+  <h1 data-page-node-id="KAKN549eIo0y5MEKdPJeEA" id="gameTitle">🎨 涂色乐园 <span class="t-speaker">🔊</span></h1>
+  <div class="nav" data-page-node-id="qyw3dKdlAhlJa6bccVhDsL">
+    <div class="cats" id="cats"></div>
+    <div class="subs" id="subs"></div>
+  </div>
+  <div class="pics" id="pics"></div>
+  <div class="main" data-page-node-id="ccF7DSXaqm6SHsQ7v2YDog">
+    <div class="canvas-box" id="canvasBox" data-page-node-id="rlJHIOYc5ouZWk0CKE4uNq">
+      <svg id="board" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" data-page-node-id="e9pNLF6WKgNFehwuZSPeB9"></svg>
+    </div>
+    <div class="tools" data-page-node-id="7rzlBlRy9imzBC7AnnxZYT">
+      <div class="current" data-page-node-id="RqOk5XxlFKwE9dmqnUEOs1"><div id="curColor" data-page-node-id="hLwNTDlr0IEJ6gDDhxjAmH"></div><span data-page-node-id="u0EXlHVLIHxXBEOZstJLOB">当前颜色：<b id="curName" data-page-node-id="hEusoyVttNOHcdirTYDLMz">粉红</b></span></div>
+      <div class="palette" id="palette" data-page-node-id="9aTf5gJ5YzF2lYd6dDzLAu"></div>
+      <div class="btn-row" data-page-node-id="GsusTl8jApL8oZ8bQ0Vl7p">
+        <button class="tool-btn" id="btnEraser" data-page-node-id="Q9nldg6pnFYZHhGQXeRvDu">🧽 橡皮擦</button>
+        <button class="tool-btn" id="btnUndo" data-page-node-id="1rV9axtFpKLIn3GccyrKiU">↩️ 撤销</button>
+        <button class="tool-btn" id="btnClear" data-page-node-id="eu5eYHp5UZNZ7rCeNRDv9L">🗑️ 全部重来</button>
+        <button class="tool-btn" id="btnSound" data-page-node-id="0lDeW4hQ2JaQfEowLJ1EPS">🔊 声音开</button>
+        <button class="tool-btn" id="btnSave" data-page-node-id="kjbMQ4kifRXBfSb7xBbUMT">💾 保存我的画</button>
+      </div>
+      <div class="tip" id="tipLine" data-page-node-id="5Tbzp15uUg0Z3TsLrp31nK">选一个颜色，再点图案上想涂的地方吧！ <span class="t-speaker">🔊</span></div>
+    </div>
+  </div>
+
+<script>
+const COLORS = [
+  ["#ff6b9d","粉红","Pink"], ["#ff4d4d","大红","Red"], ["#ff9f43","橙色","Orange"], ["#ffd93d","黄色","Yellow"], ["#a8e063","嫩绿","Light green"], ["#38a169","深绿","Dark green"],
+  ["#63e6be","薄荷","Mint"], ["#4dabf7","天蓝","Sky blue"], ["#1c7ed6","深蓝","Dark blue"], ["#9775fa","紫色","Purple"], ["#f783ac","桃粉","Peach pink"], ["#8d5524","棕色","Brown"],
+  ["#f1c27d","浅棕","Light brown"], ["#ffdab9","肤色","Skin color"], ["#ced4da","灰色","Gray"], ["#495057","深灰","Dark gray"], ["#ffffff","白色","White"], ["#212529","黑色","Black"],
+  ["#ffe066","金黄","Golden yellow"], ["#74c0fc","浅蓝","Light blue"], ["#b2f2bb","浅绿","Pale green"], ["#ffc9c9","浅粉","Light pink"], ["#d0bfff","浅紫","Light purple"], ["#fff3bf","奶黄","Cream yellow"]
+];
+
+const PICTURES = [
+{ name: "🐱 小花猫", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <path class="rg" d="M285 240 Q350 228 338 160 Q332 128 305 132" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="200" cy="218" rx="88" ry="72" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="148" cy="198" rx="22" ry="15" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="248" cy="252" rx="20" ry="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="200" cy="250" rx="46" ry="40" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="160" cy="283" rx="28" ry="15" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="240" cy="283" rx="28" ry="15" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path d="M152 276 v14 M168 276 v14 M232 276 v14 M248 276 v14" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M136 196 Q200 226 264 196 L264 210 Q200 240 136 210 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="200" cy="232" r="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M197 236 a4 4 0 0 0 6 0" stroke="#333" stroke-width="1.5" fill="none"/>
+  <path class="rg" d="M128 78 L112 8 L182 52 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M272 78 L288 8 L218 52 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M137 62 L130 28 L168 50 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M263 62 L270 28 L232 50 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="115" r="82" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="200" cy="70" rx="30" ry="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="166" cy="108" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="234" cy="108" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="169" cy="110" r="5.5" fill="#333"/>
+  <circle cx="237" cy="110" r="5.5" fill="#333"/>
+  <circle cx="171" cy="107" r="1.8" fill="#fff"/>
+  <circle cx="239" cy="107" r="1.8" fill="#fff"/>
+  <circle class="rg" cx="140" cy="142" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="260" cy="142" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M190 138 L210 138 L200 150 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M200 150 Q192 162 180 156 M200 150 Q208 162 220 156" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M110 122 L50 112 M112 140 L52 146 M290 122 L350 112 M288 140 L348 146" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>` },
+
+{ name: "🐰 小兔子", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <path class="rg" d="M62 48 C54 32 30 40 38 56 C43 66 62 78 62 78 C62 78 81 66 86 56 C94 40 70 32 62 48 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M118 32 C112 20 94 26 100 38 C104 46 118 54 118 54 C118 54 132 46 136 38 C142 26 124 20 118 32 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="160" cy="62" rx="22" ry="62" fill="#fff" stroke="#333" stroke-width="4" transform="rotate(-12 160 62)"/>
+  <ellipse class="rg" cx="240" cy="62" rx="22" ry="62" fill="#fff" stroke="#333" stroke-width="4" transform="rotate(12 240 62)"/>
+  <ellipse class="rg" cx="160" cy="68" rx="10" ry="44" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-12 160 62)"/>
+  <ellipse class="rg" cx="240" cy="68" rx="10" ry="44" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(12 240 62)"/>
+  <ellipse class="rg" cx="200" cy="238" rx="78" ry="60" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="132" cy="226" rx="14" ry="24" fill="#fff" stroke="#333" stroke-width="3" transform="rotate(15 132 226)"/>
+  <ellipse class="rg" cx="268" cy="226" rx="14" ry="24" fill="#fff" stroke="#333" stroke-width="3" transform="rotate(-15 268 226)"/>
+  <ellipse class="rg" cx="200" cy="252" rx="44" ry="36" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="155" cy="284" rx="30" ry="16" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="245" cy="284" rx="30" ry="16" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="200" cy="140" r="66" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="146" cy="158" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="254" cy="158" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="172" cy="126" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="228" cy="126" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="175" cy="128" r="5" fill="#333"/>
+  <circle cx="231" cy="128" r="5" fill="#333"/>
+  <path class="rg" d="M192 148 L208 148 L200 158 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M200 158 Q194 166 186 162 M200 158 Q206 166 214 162" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect class="rg" x="194" y="160" width="12" height="13" rx="2" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M200 160 v13" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="326" cy="112" rx="18" ry="9" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-56 326 112)"/>
+  <ellipse class="rg" cx="342" cy="104" rx="18" ry="9" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-80 342 104)"/>
+  <ellipse class="rg" cx="358" cy="112" rx="18" ry="9" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(56 358 112)"/>
+  <path class="rg" d="M330 134 Q364 130 368 162 Q372 200 352 228 Q344 238 336 226 Q316 198 320 162 Q322 136 330 134 Z" fill="#fff" stroke="#333" stroke-width="3.2"/>
+  <path d="M334 154 q-2 24 4 44 M346 152 q-2 26 2 48" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+` },
+
+{ name: "🐠 海底世界", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="330" cy="60" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="352" cy="92" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="318" cy="38" r="6" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M58 272 Q44 218 62 168 Q76 214 66 268 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M84 276 Q96 232 82 192 Q70 232 76 274 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M0 300 L0 268 Q100 248 200 266 Q300 284 400 260 L400 300 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <polygon class="rg" points="118,252 128,268 146,270 132,282 137,298 118,289 99,298 104,282 90,270 108,268" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="330,215 362,196 362,234" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="300" cy="215" rx="40" ry="25" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="282" cy="208" r="6" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle cx="284" cy="209" r="2.8" fill="#333"/>
+  <polygon class="rg" points="298,222 314,238 294,240" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="282,130 340,88 340,172" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M148 78 Q180 28 222 72 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="185" cy="130" rx="100" ry="62" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="150" cy="112" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="185" cy="100" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="220" cy="112" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M185 148 Q228 164 214 198 Q172 184 185 148 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="112" cy="112" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="116" cy="114" r="6" fill="#333"/>
+  <circle cx="118" cy="111" r="1.8" fill="#fff"/>
+  <path d="M92 150 Q104 160 120 154" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>` },
+
+{ name: "🦋 花蝴蝶", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="60" cy="226" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="80" cy="240" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="73" cy="264" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="47" cy="264" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="40" cy="240" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="60" cy="246" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="345" cy="228" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="365" cy="242" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="358" cy="266" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="332" cy="266" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="325" cy="242" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="345" cy="248" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M20 292 q4 -12 0 -22 M95 294 q5 -12 0 -20 M300 294 q5 -12 0 -22 M380 292 q-4 -12 0 -20" stroke="#38a169" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse class="rg" cx="118" cy="100" rx="68" ry="60" fill="#fff" stroke="#333" stroke-width="4" transform="rotate(-22 118 100)"/>
+  <ellipse class="rg" cx="282" cy="100" rx="68" ry="60" fill="#fff" stroke="#333" stroke-width="4" transform="rotate(22 282 100)"/>
+  <ellipse class="rg" cx="130" cy="205" rx="56" ry="52" fill="#fff" stroke="#333" stroke-width="4" transform="rotate(18 130 205)"/>
+  <ellipse class="rg" cx="270" cy="205" rx="56" ry="52" fill="#fff" stroke="#333" stroke-width="4" transform="rotate(-18 270 205)"/>
+  <circle class="rg" cx="92" cy="84" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="140" cy="116" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="308" cy="84" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="260" cy="116" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="112" cy="212" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="150" cy="196" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="288" cy="212" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="250" cy="196" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="190" y="88" width="20" height="145" rx="10" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path d="M191 130 h18 M191 160 h18 M191 190 h18" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="74" r="19" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path d="M190 60 Q176 30 160 24 M210 60 Q224 30 240 24" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="160" cy="24" r="4" fill="#333"/>
+  <circle cx="240" cy="24" r="4" fill="#333"/>
+  <path d="M193 80 q7 7 14 0" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>` },
+
+{ name: "🦆 小鸭子", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="348" cy="54" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="330" cy="74" rx="34" ry="15" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M20 258 Q60 234 200 238 Q340 242 380 258 Q340 282 200 282 Q60 282 20 258 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M60 246 q10 -44 18 -14 q10 -38 14 14 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M352 246 q10 -44 18 -14 q10 -38 14 14 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M290 202 Q320 190 328 204 Q316 218 292 216 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="216" cy="218" rx="78" ry="46" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M238 196 Q278 190 286 218 Q274 242 230 238 Q208 226 216 204 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M168 180 Q156 162 148 148 L174 134 Q186 154 192 178 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="132" cy="138" r="42" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M94 140 Q66 132 62 146 Q66 160 94 152 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M64 142 L94 146" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="126" cy="126" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="127" cy="127" r="4.5" fill="#333"/>
+  <path class="rg" d="M300 252 Q318 236 338 244 Q348 254 338 264 Q318 268 300 258 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="322" cy="242" r="16" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M308 242 Q300 238 300 244 Q302 250 308 248 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="322" cy="236" r="3" fill="#333"/>
+  <path class="rg" d="M196 260 q14 -8 28 0" stroke="#333" stroke-width="2" fill="#fff"/>` },
+
+{ name: "🏠 小房子", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="215" fill="#fff"/>
+  <circle class="rg" cx="358" cy="42" r="28" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="80" cy="52" rx="30" ry="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="66" cy="42" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="95" cy="42" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="185" cy="32" rx="22" ry="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M320 60 q8 -8 16 0 q8 -8 16 0 M355 42 q6 -6 12 0 q6 -6 12 0" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect class="rg" x="0" y="215" width="400" height="85" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="18" y="252" width="70" height="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="22" y="240" width="8" height="34" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="48" y="240" width="8" height="34" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="74" y="240" width="8" height="34" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="280" cy="64" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="296" cy="44" r="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="268" y="82" width="24" height="48" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <polygon class="rg" points="98,142 302,142 200,55" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="200" cy="112" r="15" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M185 112 h30 M200 97 v30" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="115" y="142" width="170" height="98" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="182" y="182" width="40" height="58" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle cx="213" cy="212" r="3" fill="#333"/>
+  <rect class="rg" x="132" y="162" width="38" height="32" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M151 162 v32 M132 178 h38" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="240" y="162" width="38" height="32" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M259 162 v32 M240 178 h38" stroke="#333" stroke-width="1.8"/>
+  <ellipse class="rg" cx="105" cy="252" rx="26" ry="16" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="298" cy="254" rx="30" ry="18" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="352" y="205" width="12" height="40" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="358" cy="182" r="32" fill="#fff" stroke="#333" stroke-width="3"/>
+  <polygon class="rg" points="185,240 220,240 260,300 145,300" fill="#fff" stroke="#333" stroke-width="2.5"/>` },
+
+{ name: "🚗 小汽车", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="235" fill="#fff"/>
+  <circle class="rg" cx="45" cy="45" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="330" cy="50" rx="28" ry="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="316" cy="40" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="0" y="235" width="400" height="65" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M25 268 h45 M105 268 h45 M185 268 h45 M265 268 h45 M345 268 h45" stroke="#999" stroke-width="5" stroke-linecap="round"/>
+  <rect class="rg" x="22" y="195" width="11" height="42" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="28" cy="168" r="30" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="372" y="158" width="7" height="79" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="357" y="100" width="36" height="58" rx="9" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="375" cy="115" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="375" cy="130" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="375" cy="145" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M50 242 Q46 190 100 185 L120 152 Q127 140 145 140 L250 140 Q268 140 277 154 L295 185 Q352 192 348 242 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M128 152 L180 152 L180 182 L110 182 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M195 152 L248 152 L264 182 L195 182 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M188 140 L188 240" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="196" y="192" width="16" height="5" rx="2.5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <circle class="rg" cx="120" cy="252" r="32" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="285" cy="252" r="32" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle cx="120" cy="252" r="12" fill="#333"/>
+  <circle cx="285" cy="252" r="12" fill="#333"/>
+  <circle class="rg" cx="342" cy="205" r="10" fill="#fff" stroke="#333" stroke-width="2"/>` },
+
+{ name: "🗺️ 宝藏岛", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="58" cy="46" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 238 Q100 230 200 236 Q300 242 400 234 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M120 190 L162 126 L204 190 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M148 148 L162 126 L176 148 L168 142 L162 154 L154 144 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M188 188 L236 132 L282 188 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M64 240 Q70 196 118 178 Q170 156 228 164 Q288 172 316 206 Q332 224 336 240 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M112 236 Q104 194 102 158 L112 156 Q118 194 126 236 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M104 156 Q72 142 56 108 Q90 112 108 142 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M104 156 Q96 120 108 92 Q128 118 116 148 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M104 156 Q130 130 164 124 Q152 154 112 162 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M288 238 Q296 196 300 160 L310 162 Q304 198 296 238 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M302 158 Q270 146 254 114 Q288 116 306 146 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M302 158 Q296 124 308 98 Q326 124 314 152 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M302 158 Q328 134 360 130 Q348 158 310 166 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M170 198 L232 198 L228 234 L174 234 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M168 198 Q168 174 200 174 Q232 174 232 198 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="192" y="204" width="16" height="18" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="348" cy="262" r="24" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="348" cy="262" r="15" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M348 250 L354 262 L348 260 Z" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <path class="rg" d="M348 274 L342 262 L348 264 Z" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <path class="rg" d="M26 268 q14 -12 28 0 q-14 10 -28 0 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M300 268 q14 -12 28 0 q-14 10 -28 0 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M244 210 l14 14 M258 210 l-14 14" stroke="#333" stroke-width="4" stroke-linecap="round"/>` },
+
+{ name: "🍎 苹果树", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="228" fill="#fff"/>
+  <circle class="rg" cx="352" cy="44" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="92" cy="46" rx="28" ry="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="78" cy="36" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="0" y="228" width="400" height="72" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M40 270 q4 -12 0 -20 M55 274 q4 -10 0 -18 M352 268 q-4 -12 0 -20 M367 272 q-4 -10 0 -16" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M190 196 Q160 168 138 138" stroke="#333" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M212 196 Q242 168 264 138" stroke="#333" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M180 270 Q186 226 188 190 L212 190 Q214 226 222 270 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M180 266 q-18 2 -26 10 q20 2 28 -4 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M222 266 q18 2 26 10 q-20 2 -28 -4 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M194 250 q3 -18 0 -32 M208 252 q-3 -18 0 -32" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle class="rg" cx="200" cy="100" r="66" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="140" cy="128" r="46" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="262" cy="126" r="46" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="200" cy="52" r="34" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="168" cy="112" r="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="238" cy="108" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="140" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="150" cy="150" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="256" cy="148" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="196" cy="66" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M226 30 Q230 22 236 20" stroke="#333" stroke-width="2" fill="none"/>
+  <ellipse class="rg" cx="240" cy="24" rx="14" ry="10" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle cx="238" cy="22" r="2" fill="#333"/>
+  <polygon class="rg" points="252,26 262,29 252,33" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="226,26 216,20 218,32" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="266,270 264,158 272,156 276,268" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="288,272 286,160 294,158 298,270" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M272 176 h20 M276 198 h20 M280 220 h20 M284 242 h20" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+  <path class="rg" d="M50 246 Q50 282 86 282 Q122 282 122 246 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M60 256 h52 M56 266 h60 M62 276 h48" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="74" cy="240" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="98" cy="240" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+` },
+
+{ name: "🧸 幼儿园", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="215" fill="#fff"/>
+  <circle class="rg" cx="358" cy="42" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="70" cy="48" rx="26" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="59" cy="39" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="185" cy="32" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="0" y="215" width="400" height="85" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect x="178" y="18" width="4" height="42" fill="#333"/>
+  <polygon class="rg" points="182,18 218,29 182,42" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="25" y="180" width="10" height="36" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="30" cy="162" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="80" y="115" width="200" height="100" fill="#fff" stroke="#333" stroke-width="4"/>
+  <polygon class="rg" points="68,115 292,115 180,58" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="180" cy="88" r="13" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M167 88 h26 M180 75 v26" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="162" y="158" width="36" height="57" rx="18" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="100" y="138" width="30" height="28" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M115 138 v28 M100 152 h30" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="230" y="138" width="30" height="28" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M245 138 v28 M230 152 h30" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="300" y="140" width="34" height="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M304 149 v66 M330 149 v66 M304 168 h26 M304 188 h26 M304 208 h26" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <polygon class="rg" points="334,149 372,210 358,217 320,156" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="70,252 200,242 202,252 72,262" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon points="130,270 144,270 137,252" fill="#333"/>
+  <circle cx="74" cy="248" r="5" fill="#333"/>
+  <circle cx="198" cy="238" r="5" fill="#333"/>
+  <circle class="rg" cx="250" cy="278" r="16" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M235 272 q15 -10 30 0" stroke="#333" stroke-width="2" fill="none"/>
+  <circle class="rg" cx="312" cy="228" r="5" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="332" cy="228" r="5" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="322" cy="238" r="14" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="322" cy="264" rx="15" ry="17" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle cx="317" cy="235" r="1.8" fill="#333"/>
+  <circle cx="327" cy="235" r="1.8" fill="#333"/>
+  <path d="M318 243 q4 3 8 0" stroke="#333" stroke-width="1.5" fill="none" stroke-linecap="round"/>` },
+
+{ name: "🏫 小学", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="218" fill="#fff"/>
+  <circle class="rg" cx="352" cy="44" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="60" cy="50" rx="26" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="49" cy="41" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="0" y="218" width="400" height="82" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="28" y="185" width="10" height="35" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="33" cy="167" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="362" y="185" width="10" height="35" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="367" cy="167" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect x="198" y="8" width="4" height="34" fill="#333"/>
+  <polygon class="rg" points="202,8 234,18 202,30" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="60" y="130" width="280" height="88" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="168" y="72" width="64" height="58" fill="#fff" stroke="#333" stroke-width="4"/>
+  <polygon class="rg" points="160,72 240,72 200,40" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="200" cy="100" r="17" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M200 100 L200 89 M200 100 L208 103" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect class="rg" x="80" y="148" width="28" height="26" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M94 148 v26 M80 161 h28" stroke="#333" stroke-width="1.6"/>
+  <rect class="rg" x="130" y="148" width="28" height="26" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M144 148 v26 M130 161 h28" stroke="#333" stroke-width="1.6"/>
+  <rect class="rg" x="242" y="148" width="28" height="26" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M256 148 v26 M242 161 h28" stroke="#333" stroke-width="1.6"/>
+  <rect class="rg" x="292" y="148" width="28" height="26" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M306 148 v26 M292 161 h28" stroke="#333" stroke-width="1.6"/>
+  <rect class="rg" x="180" y="162" width="19" height="56" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="199" y="162" width="19" height="56" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle cx="194" cy="192" r="2.5" fill="#333"/>
+  <circle cx="204" cy="192" r="2.5" fill="#333"/>
+  <rect class="rg" x="172" y="218" width="56" height="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="164" y="226" width="72" height="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="180,234 220,234 245,300 155,300" fill="#fff" stroke="#333" stroke-width="2.5"/>` },
+
+{ name: "🚂 小火车", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="260" fill="#fff"/>
+  <circle class="rg" cx="355" cy="45" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="90" cy="262" rx="140" ry="60" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="290" cy="266" rx="150" ry="65" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="128" cy="95" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="148" cy="68" r="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="170" cy="42" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="42" y="100" width="82" height="12" rx="5" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="48" y="108" width="70" height="57" rx="7" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="62" y="120" width="30" height="26" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="120" y="112" width="40" height="12" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="128" y="122" width="24" height="38" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="40" y="160" width="160" height="78" rx="12" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="95" y="160" width="10" height="78" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="145" y="160" width="10" height="78" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="52" cy="180" r="10" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="40,238 16,268 40,268" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="218" y="146" width="169" height="13" rx="6" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="225" y="155" width="155" height="83" rx="9" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="245" y="175" width="30" height="28" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="295" y="175" width="30" height="28" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="340" y="175" width="25" height="28" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M200 235 h25" stroke="#333" stroke-width="3.5" stroke-linecap="round"/>
+  <circle class="rg" cx="70" cy="250" r="13" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="115" cy="250" r="16" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="160" cy="250" r="13" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="255" cy="250" r="13" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="330" cy="250" r="13" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle cx="115" cy="250" r="5" fill="#333"/>
+  <rect x="0" y="264" width="400" height="8" fill="#333"/>
+  <path d="M25 260 v16 M65 260 v16 M105 260 v16 M145 260 v16 M185 260 v16 M225 260 v16 M265 260 v16 M305 260 v16 M345 260 v16 M385 260 v16" stroke="#333" stroke-width="4"/>` },
+
+{ name: "✈️ 大飞机", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="50" cy="48" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="150" cy="52" rx="26" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="138" cy="42" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="322" cy="258" rx="30" ry="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="308" cy="248" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M352 100 q7 -7 14 0 q7 -7 14 0" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect class="rg" x="2" y="70" width="58" height="40" rx="5" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M60 110 L88 128" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon class="rg" points="185,140 148,88 215,100 225,136" fill="#fff" stroke="#333" stroke-width="4"/>
+  <polygon class="rg" points="75,138 45,80 110,136" fill="#fff" stroke="#333" stroke-width="4"/>
+  <polygon class="rg" points="82,162 48,182 115,170" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="215" cy="150" rx="140" ry="42" fill="#fff" stroke="#333" stroke-width="4"/>
+  <polygon class="rg" points="175,155 135,215 210,203 222,152" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="160" cy="202" rx="24" ry="14" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="292" cy="120" rx="20" ry="12" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="250" y="130" width="24" height="38" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="330" cy="135" rx="16" ry="12" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="140" cy="135" r="7.5" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="170" cy="132" r="7.5" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="130" r="7.5" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="228" cy="132" r="7.5" fill="#fff" stroke="#333" stroke-width="2"/>` },
+
+{ name: "🚢 大轮船", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="232" fill="#fff"/>
+  <circle class="rg" cx="352" cy="42" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="72" cy="44" rx="28" ry="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="56" cy="34" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="0" y="232" width="400" height="68" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M24 252 q18 -10 36 0 M120 272 q18 -10 36 0 M250 250 q18 -10 36 0 M320 278 q18 -10 36 0" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M56 186 L344 186 L320 242 Q200 256 80 242 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="56" y="176" width="288" height="12" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M96 176 L96 120" stroke="#333" stroke-width="3.5" stroke-linecap="round"/>
+  <polygon class="rg" points="97,120 130,130 97,142" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="216" y="52" width="32" height="30" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="216" y="52" width="32" height="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="186" y="82" width="62" height="24" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="192" y="88" width="14" height="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="214" y="88" width="14" height="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="150" y="106" width="140" height="30" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="160" y="113" width="18" height="15" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="190" y="113" width="18" height="15" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="220" y="113" width="18" height="15" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="250" y="113" width="18" height="15" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="112" y="136" width="196" height="40" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="124" y="146" width="20" height="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="158" y="146" width="20" height="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="192" y="146" width="20" height="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="226" y="146" width="20" height="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="260" y="146" width="20" height="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="86" cy="206" r="14" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="86" cy="206" r="6" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="140" cy="212" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="186" cy="214" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="232" cy="214" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="278" cy="212" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+` },
+
+{ name: "🏬 大商场", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="210" fill="#fff"/>
+  <circle class="rg" cx="48" cy="44" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="330" cy="48" rx="26" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="317" cy="39" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M250 60 q7 -7 14 0 q7 -7 14 0" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect class="rg" x="0" y="210" width="400" height="90" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="55" y="95" width="290" height="115" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="110" y="102" width="180" height="36" rx="8" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="55" y="145" width="58" height="16" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="113" y="145" width="58" height="16" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="171" y="145" width="58" height="16" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="229" y="145" width="58" height="16" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="287" y="145" width="58" height="16" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="75" y="172" width="60" height="38" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M105 172 v38 M75 191 h60" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="265" y="172" width="60" height="38" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M295 172 v38 M265 191 h60" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="165" y="172" width="70" height="38" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M188 172 v38 M211 172 v38" stroke="#333" stroke-width="1.8"/>
+  <path d="M350 190 Q346 155 350 130" stroke="#333" stroke-width="2" fill="none"/>
+  <ellipse class="rg" cx="350" cy="112" rx="17" ry="21" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M310 195 Q306 165 310 144" stroke="#333" stroke-width="2" fill="none"/>
+  <ellipse class="rg" cx="310" cy="126" rx="14" ry="18" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="120" y="236" width="70" height="8" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="120" y="252" width="70" height="10" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M126 262 v18 M184 262 v18" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+  <rect class="rg" x="245" y="252" width="34" height="30" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M252 252 q10 -14 20 0" stroke="#333" stroke-width="2.5" fill="none"/>
+  <ellipse class="rg" cx="70" cy="282" rx="26" ry="14" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="340" cy="282" rx="26" ry="14" fill="#fff" stroke="#333" stroke-width="2.5"/>` },
+
+{ name: "🍉 大西瓜", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="360" cy="42" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="132" cy="274" rx="86" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="132" cy="178" r="88" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M132 90 Q78 178 132 266 Q112 178 132 90 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M132 90 Q116 178 132 266 Q146 178 132 90 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M132 90 Q154 178 132 266 Q188 178 132 90 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M132 90 Q196 178 132 266 Q224 178 132 90 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="126,94 120,74 134,70 140,92" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="108" cy="72" rx="18" ry="8" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-28 108 72)"/>
+  <ellipse class="rg" cx="152" cy="74" rx="17" ry="8" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(24 152 74)"/>
+  <ellipse class="rg" cx="306" cy="278" rx="78" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="306" cy="182" r="80" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="306" cy="182" r="66" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="306" cy="182" r="52" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="306" cy="148" rx="5" ry="8" fill="#fff" stroke="#333" stroke-width="1.6"/>
+  <ellipse class="rg" cx="284" cy="172" rx="5" ry="8" fill="#fff" stroke="#333" stroke-width="1.6"/>
+  <ellipse class="rg" cx="328" cy="172" rx="5" ry="8" fill="#fff" stroke="#333" stroke-width="1.6"/>
+  <ellipse class="rg" cx="294" cy="204" rx="5" ry="8" fill="#fff" stroke="#333" stroke-width="1.6"/>
+  <ellipse class="rg" cx="318" cy="204" rx="5" ry="8" fill="#fff" stroke="#333" stroke-width="1.6"/>
+  <ellipse class="rg" cx="306" cy="222" rx="5" ry="8" fill="#fff" stroke="#333" stroke-width="1.6"/>
+` },
+
+{ name: "🍓 小草莓", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="45" cy="45" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="75" cy="120" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="97" cy="137" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="89" cy="164" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="61" cy="164" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="53" cy="137" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="75" cy="142" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="196" y="24" width="8" height="34" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="200,30 236,84 204,92" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="200,30 164,84 196,92" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="186,86 200,30 214,86" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M200 88 Q118 78 104 150 Q92 222 200 278 Q308 222 296 150 Q282 78 200 88 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="160" cy="130" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="200" cy="118" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="240" cy="130" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="140" cy="175" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="200" cy="165" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="260" cy="175" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="165" cy="220" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="235" cy="220" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <ellipse class="rg" cx="200" cy="248" rx="4.5" ry="7" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <polygon class="rg" points="314,208 330,190 346,208 330,204" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M330 208 Q290 202 283 236 Q277 268 330 292 Q383 268 377 236 Q370 202 330 208 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="316" cy="234" rx="3" ry="5" fill="#fff" stroke="#333" stroke-width="1.2"/>
+  <ellipse class="rg" cx="344" cy="234" rx="3" ry="5" fill="#fff" stroke="#333" stroke-width="1.2"/>
+  <ellipse class="rg" cx="330" cy="254" rx="3" ry="5" fill="#fff" stroke="#333" stroke-width="1.2"/>` },
+
+{ name: "🍍 大菠萝", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <ellipse class="rg" cx="200" cy="291" rx="85" ry="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="200" cy="195" rx="82" ry="92" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path d="M126 150 L274 226 M118 185 L262 260 M140 118 L282 194" stroke="#333" stroke-width="2"/>
+  <path d="M274 150 L126 226 M282 185 L138 260 M260 118 L118 194" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="200,125 220,145 200,165 180,145" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="158,162 178,182 158,202 138,182" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="242,162 262,182 242,202 222,182" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="200,200 220,220 200,240 180,220" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="163,236 181,254 163,272 145,254" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="237,236 255,254 237,272 219,254" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="200,22 188,92 212,92" fill="#fff" stroke="#333" stroke-width="3"/>
+  <polygon class="rg" points="200,26 168,96 192,90" fill="#fff" stroke="#333" stroke-width="3"/>
+  <polygon class="rg" points="200,26 232,96 208,90" fill="#fff" stroke="#333" stroke-width="3"/>
+  <polygon class="rg" points="162,52 182,102 196,92" fill="#fff" stroke="#333" stroke-width="3"/>
+  <polygon class="rg" points="238,52 218,102 204,92" fill="#fff" stroke="#333" stroke-width="3"/>` },
+
+{ name: "🍇 葡萄串", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="350" cy="45" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="206" y="34" width="9" height="48" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M215 40 Q240 30 246 48 Q248 58 238 58" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse class="rg" cx="258" cy="62" rx="40" ry="19" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(-28 258 62)"/>
+  <path d="M230 74 L286 50 M240 78 L280 62" stroke="#333" stroke-width="1.5"/>
+  <circle class="rg" cx="160" cy="118" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="210" cy="112" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="258" cy="120" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="135" cy="162" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="185" cy="158" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="235" cy="162" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="283" cy="170" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="160" cy="206" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="210" cy="204" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="258" cy="210" r="26" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="185" cy="250" r="24" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="233" cy="252" r="24" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="210" cy="276" r="21" fill="#fff" stroke="#333" stroke-width="3.5"/>` },
+
+{ name: "🌻 向日葵", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="212" fill="#fff"/>
+  <ellipse class="rg" cx="330" cy="42" rx="26" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="316" cy="33" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="235" cy="28" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="0" y="212" width="400" height="88" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M40 262 q4 -12 0 -22 M55 266 q4 -10 0 -18 M370 262 q-4 -12 0 -22 M355 266 q-4 -10 0 -18 M215 280 q4 -10 0 -18" stroke="#38a169" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect class="rg" x="124" y="146" width="12" height="78" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="100" cy="192" rx="28" ry="12" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(-25 100 192)"/>
+  <ellipse class="rg" cx="162" cy="204" rx="28" ry="12" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(18 162 204)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(0 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(36 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(72 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(108 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(144 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(180 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(216 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(252 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(288 130 118)"/>
+  <ellipse class="rg" cx="130" cy="72" rx="13" ry="30" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(324 130 118)"/>
+  <circle class="rg" cx="130" cy="118" r="30" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle cx="120" cy="110" r="2.2" fill="#8d5524"/>
+  <circle cx="140" cy="110" r="2.2" fill="#8d5524"/>
+  <circle cx="130" cy="122" r="2.2" fill="#8d5524"/>
+  <circle cx="118" cy="128" r="2.2" fill="#8d5524"/>
+  <circle cx="142" cy="128" r="2.2" fill="#8d5524"/>
+  <rect class="rg" x="295" y="174" width="10" height="50" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="278" cy="204" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-20 278 204)"/>
+  <ellipse class="rg" cx="300" cy="123" rx="9" ry="22" fill="#fff" stroke="#333" stroke-width="1.8" transform="rotate(0 300 155)"/>
+  <ellipse class="rg" cx="300" cy="123" rx="9" ry="22" fill="#fff" stroke="#333" stroke-width="1.8" transform="rotate(45 300 155)"/>
+  <ellipse class="rg" cx="300" cy="123" rx="9" ry="22" fill="#fff" stroke="#333" stroke-width="1.8" transform="rotate(90 300 155)"/>
+  <ellipse class="rg" cx="300" cy="123" rx="9" ry="22" fill="#fff" stroke="#333" stroke-width="1.8" transform="rotate(135 300 155)"/>
+  <ellipse class="rg" cx="300" cy="123" rx="9" ry="22" fill="#fff" stroke="#333" stroke-width="1.8" transform="rotate(180 300 155)"/>
+  <ellipse class="rg" cx="300" cy="123" rx="9" ry="22" fill="#fff" stroke="#333" stroke-width="1.8" transform="rotate(225 300 155)"/>
+  <ellipse class="rg" cx="300" cy="123" rx="9" ry="22" fill="#fff" stroke="#333" stroke-width="1.8" transform="rotate(270 300 155)"/>
+  <ellipse class="rg" cx="300" cy="123" rx="9" ry="22" fill="#fff" stroke="#333" stroke-width="1.8" transform="rotate(315 300 155)"/>
+  <circle class="rg" cx="300" cy="155" r="20" fill="#fff" stroke="#333" stroke-width="3"/>` },
+
+{ name: "🌵 小仙人掌", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="242" fill="#fff"/>
+  <rect class="rg" x="0" y="242" width="400" height="58" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="188" cy="290" rx="95" ry="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="160" y="82" width="62" height="148" rx="31" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="103" y="108" width="34" height="72" rx="17" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="118" y="152" width="48" height="30" rx="15" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="245" y="128" width="34" height="62" rx="17" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="216" y="162" width="48" height="30" rx="15" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path d="M170 100 l-6 -4 M170 120 l-6 -4 M170 140 l-6 -4 M170 160 l-6 -4 M212 100 l6 -4 M212 120 l6 -4 M212 140 l6 -4 M212 160 l6 -4 M114 124 l-6 -4 M114 144 l-6 -4 M256 144 l6 -4 M256 164 l6 -4" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <circle class="rg" cx="191" cy="46" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="205" cy="56" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="73" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="182" cy="73" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="177" cy="56" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="191" cy="60" r="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="112" y="222" width="150" height="20" rx="7" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <polygon class="rg" points="124,242 250,242 236,292 138,292" fill="#fff" stroke="#333" stroke-width="4"/>
+  <polygon class="rg" points="165,257 174,266 165,275 156,266" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="208,257 217,266 208,275 199,266" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="186,244 194,252 186,260 178,252" fill="#fff" stroke="#333" stroke-width="2"/>` },
+
+{ name: "🏢 剖面小楼", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <rect class="rg" x="0" y="282" width="400" height="18" fill="#fff" stroke="#333" stroke-width="3"/>
+  <polygon class="rg" points="34,30 366,30 350,8 50,8" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="40" y="30" width="160" height="84" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="200" y="30" width="160" height="84" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="40" y="120" width="160" height="76" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="200" y="120" width="160" height="76" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="40" y="202" width="160" height="80" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="200" y="202" width="160" height="80" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="40" y="114" width="320" height="6" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="40" y="196" width="320" height="6" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="140" y="38" width="46" height="32" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M163 38 v32 M140 54 h46" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="134,36 142,36 142,72 130,68" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="186,36 192,36 196,68 186,72" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="52" y="64" width="12" height="48" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="64" y="80" width="88" height="32" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="70" y="74" width="26" height="13" rx="6" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="102" y="80" width="50" height="32" rx="4" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M66 112 v8 M148 112 v8" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="156" y="88" width="22" height="24" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="159,82 172,82 169,72 162,72" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <path d="M165 82 v6" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="60" y="40" width="34" height="26" rx="2" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect x="65" y="45" width="24" height="16" fill="none" stroke="#333" stroke-width="1.2"/>
+  <rect class="rg" x="206" y="36" width="62" height="74" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M206 60 h62 M206 86 h62" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="211" y="42" width="9" height="17" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <rect class="rg" x="222" y="42" width="9" height="17" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <rect class="rg" x="233" y="42" width="9" height="17" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <rect class="rg" x="244" y="42" width="9" height="17" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <rect class="rg" x="211" y="66" width="9" height="18" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <rect class="rg" x="222" y="66" width="9" height="18" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <rect class="rg" x="233" y="66" width="9" height="18" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <rect class="rg" x="280" y="86" width="72" height="8" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M286 94 v10 M346 94 v10" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="288" y="62" width="30" height="20" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M303 82 v4" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="320" y="94" width="24" height="12" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="340" y="74" width="6" height="22" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="270,44 282,44 280,56 272,56" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="276" cy="36" r="7" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="266" cy="41" r="6" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="286" cy="40" r="6" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="48" y="124" width="52" height="20" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="118" y="124" width="28" height="16" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="46" y="158" width="104" height="10" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="46" y="168" width="104" height="26" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M96 168 v26 M46 181 h104" stroke="#333" stroke-width="1.6"/>
+  <rect class="rg" x="58" y="146" width="34" height="12" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="64" y="132" width="22" height="14" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M70 124 q4 -6 0 -10 M80 124 q4 -6 0 -10" stroke="#333" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <rect class="rg" x="104" y="148" width="30" height="10" rx="4" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="156" y="126" width="38" height="66" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M156 156 h38 M188 150 v14" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="206" y="124" width="34" height="18" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="248" y="130" width="34" height="12" rx="4" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M262 142 v20" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="206" y="148" width="82" height="44" rx="16" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="213" y="156" width="68" height="28" rx="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="222" cy="144" r="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <rect class="rg" x="292" y="132" width="8" height="26" rx="2" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="300" y="124" width="56" height="72" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="326" cy="134" r="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M326 127 v-3" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="46" y="228" width="8" height="34" rx="4" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="138" y="228" width="8" height="34" rx="4" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="50" y="220" width="92" height="16" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="50" y="236" width="92" height="28" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="56" y="226" width="36" height="12" rx="5" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="100" y="226" width="36" height="12" rx="5" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="52" y="270" width="86" height="6" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M58 276 v6 M132 276 v6" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="158" y="214" width="34" height="24" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M168 238 v8 M186 238 v8" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="152,262 168,262 165,278 155,278" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="158" cy="254" r="9" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="149" cy="258" r="6" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="167" cy="258" r="6" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="204,282 204,268 226,268 226,254 248,254 248,240 270,240 270,226 292,226 292,282" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M204 268 h22 M226 254 h22 M248 240 h22 M270 226 h22" stroke="#333" stroke-width="1.8"/>
+  <path d="M206 262 L292 220" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="318" y="234" width="34" height="48" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle cx="322" cy="258" r="2.5" fill="#333"/>
+  <ellipse class="rg" cx="300" cy="276" rx="14" ry="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="312" cy="270" r="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M288 276 q-10 -4 -8 -12" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <polygon class="rg" points="296,208 312,208 309,220 299,220" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="304" cy="202" r="8" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect x="40" y="30" width="320" height="252" fill="none" stroke="#333" stroke-width="5"/>` },
+
+{ name: "🔬 海底基地", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="376" cy="26" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="390" cy="48" r="5" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="382" cy="112" rx="14" ry="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="368,112 356,104 356,120" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="386" cy="110" r="1.8" fill="#333"/>
+  <circle class="rg" cx="332" cy="282" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="350" cy="288" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="26" y="34" width="330" height="232" rx="10" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="26" y="34" width="330" height="14" rx="7" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="26" y="152" width="330" height="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="120" y="50" width="40" height="5" rx="2.5" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="210" y="50" width="40" height="5" rx="2.5" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="38" y="56" width="96" height="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="44" y="68" width="16" height="20" rx="2" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="66" y="68" width="16" height="20" rx="2" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="88" y="68" width="16" height="20" rx="2" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="38" y="94" width="60" height="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="40,120 56,120 53,136 43,136" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="48" cy="111" r="9" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="39" cy="115" r="6" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="57" cy="115" r="6" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="140" y="118" width="104" height="10" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="150,118 166,118 160,102 156,102" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="172,118 188,118 182,98 178,98" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="200" cy="110" r="8" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="206" y="110" width="24" height="8" rx="2" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="222" y="92" width="5" height="20" rx="2" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="252" y="52" width="90" height="56" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M252 88 h90 M297 52 v56" stroke="#333" stroke-width="1.6"/>
+  <rect class="rg" x="272" y="116" width="26" height="12" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="272" y="102" width="5" height="16" rx="2" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="340" y="118" width="14" height="28" rx="2" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="40" y="166" width="150" height="86" rx="6" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M115 166 v86" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="56" y="196" width="110" height="30" rx="15" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="80" cy="211" r="7" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="106" cy="211" r="7" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="132" cy="211" r="7" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="166,211 180,200 180,222" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="57" cy="211" r="5" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <path class="rg" d="M150 250 Q140 230 152 214 Q162 230 156 248 Z" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <path class="rg" d="M172 250 Q182 232 170 216 Q162 232 168 248 Z" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <ellipse class="rg" cx="72" cy="240" rx="12" ry="7" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="84,240 96,232 96,248" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle cx="68" cy="239" r="1.5" fill="#333"/>
+  <rect class="rg" x="212" y="168" width="66" height="94" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="220" y="180" width="50" height="20" rx="3" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="220" y="204" width="50" height="20" rx="3" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="220" y="228" width="50" height="20" rx="3" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="290" y="166" width="54" height="36" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M290 184 h54 M308 166 v36 M326 166 v36" stroke="#333" stroke-width="1.6"/>
+  <circle class="rg" cx="316" cy="232" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="316" cy="232" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M316 222 v-6 M316 242 v6 M306 232 h-6 M326 232 h6" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>` },
+
+{ name: "🦁 小狮子", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="42" cy="44" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="200" cy="274" rx="96" ry="44" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="146" cy="292" rx="28" ry="14" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="254" cy="292" rx="28" ry="14" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="200" cy="150" r="108" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="200" cy="150" r="86" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="146" cy="74" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="254" cy="74" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="146" cy="74" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="254" cy="74" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="150" r="72" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="200" cy="182" rx="44" ry="32" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="174" cy="136" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="226" cy="136" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="177" cy="138" r="5.5" fill="#333"/>
+  <circle cx="229" cy="138" r="5.5" fill="#333"/>
+  <circle cx="179" cy="135" r="1.8" fill="#fff"/>
+  <circle cx="231" cy="135" r="1.8" fill="#fff"/>
+  <polygon class="rg" points="187,166 213,166 200,180" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M200 180 v7 M200 187 q-8 8 -16 2 M200 187 q8 8 16 2" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <circle cx="160" cy="176" r="1.8" fill="#333"/>
+  <circle cx="152" cy="184" r="1.8" fill="#333"/>
+  <circle cx="160" cy="192" r="1.8" fill="#333"/>
+  <circle cx="240" cy="176" r="1.8" fill="#333"/>
+  <circle cx="248" cy="184" r="1.8" fill="#333"/>
+  <circle cx="240" cy="192" r="1.8" fill="#333"/>` },
+
+{ name: "🐯 小老虎", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="362" cy="42" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="200" cy="220" rx="100" ry="62" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="200" cy="238" rx="54" ry="40" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="146" cy="276" rx="28" ry="15" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="254" cy="276" rx="28" ry="15" fill="#fff" stroke="#333" stroke-width="3"/>
+  <polygon class="rg" points="106,196 138,206 108,214" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="294,196 262,206 292,214" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="112" r="74" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="144" cy="54" r="22" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="256" cy="54" r="22" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="144" cy="54" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="256" cy="54" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="182,40 190,80 198,40" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="202,40 210,80 218,40" fill="#fff" stroke="#333" stroke-width="2"/>
+  <polygon class="rg" points="126,118 158,124 128,132" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="126,142 156,144 128,152" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="274,118 242,124 272,132" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <polygon class="rg" points="274,142 244,144 272,152" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle class="rg" cx="182" cy="140" r="20" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="218" cy="140" r="20" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="192,120 208,120 200,130" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M200 130 v6 M200 136 q-9 9 -18 3 M200 136 q9 9 18 3" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <circle class="rg" cx="172" cy="100" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="228" cy="100" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="175" cy="102" r="5" fill="#333"/>
+  <circle cx="231" cy="102" r="5" fill="#333"/>` },
+
+{ name: "🦕 长颈龙", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="352" cy="50" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="72" cy="52" rx="38" ry="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M0 262 Q100 248 200 258 Q300 268 400 252 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M130 216 Q86 216 44 194 Q34 188 42 180 Q88 200 132 196 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="150" y="230" width="28" height="44" rx="12" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="188" y="232" width="28" height="42" rx="12" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="238" y="232" width="28" height="42" rx="12" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="272" y="230" width="28" height="44" rx="12" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="210" cy="210" rx="80" ry="46" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="206" cy="224" rx="54" ry="28" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M250 184 Q278 164 294 126 L318 136 Q304 182 272 204 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="316" cy="120" rx="30" ry="20" fill="#fff" stroke="#333" stroke-width="3.5" transform="rotate(-16 316 120)"/>
+  <circle class="rg" cx="328" cy="114" r="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="329" cy="114" r="3.5" fill="#333"/>
+  <path d="M336 126 q10 2 12 8" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle class="rg" cx="196" cy="192" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="230" cy="200" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="164" cy="204" r="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="330" cy="66" rx="30" ry="14" fill="#fff" stroke="#333" stroke-width="2"/>` },
+
+{ name: "🥕 胡萝卜", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="352" cy="42" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 250 Q100 234 200 248 Q300 262 400 242 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="152" cy="86" rx="10" ry="24" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-26 152 86)"/>
+  <ellipse class="rg" cx="176" cy="78" rx="10" ry="26" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="200" cy="86" rx="10" ry="24" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(26 200 86)"/>
+  <path class="rg" d="M150 106 Q178 94 204 106 Q206 174 180 248 Q176 256 172 248 Q146 174 150 106 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path d="M158 140 q14 -4 26 -3 M162 176 q12 -4 24 -3 M168 212 q10 -4 20 -3" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse class="rg" cx="248" cy="132" rx="8" ry="19" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-24 248 132)"/>
+  <ellipse class="rg" cx="266" cy="126" rx="8" ry="20" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="284" cy="132" rx="8" ry="19" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(24 284 132)"/>
+  <path class="rg" d="M246 150 Q266 141 286 150 Q287 196 270 240 Q266 246 262 240 Q245 196 246 150 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M252 172 q10 -3 20 -2 M256 200 q9 -3 17 -2" stroke="#333" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <ellipse class="rg" cx="308" cy="176" rx="7" ry="16" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-24 308 176)"/>
+  <ellipse class="rg" cx="321" cy="172" rx="7" ry="17" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="334" cy="176" rx="7" ry="16" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(24 334 176)"/>
+  <path class="rg" d="M306 190 Q320 183 335 190 Q335 228 323 262 Q320 267 317 262 Q305 228 306 190 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M311 208 q8 -3 15 -2 M314 230 q7 -3 13 -2" stroke="#333" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M40 274 q6 -14 0 -24 M56 278 q6 -12 0 -20 M96 286 q6 -12 0 -18 M140 270 q-5 -12 0 -20" stroke="#38a169" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+` },
+
+{ name: "🍅 番茄", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="348" cy="50" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="0" y="252" width="400" height="48" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="170" cy="256" rx="76" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="168" cy="178" r="66" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path d="M132 146 Q146 128 168 126" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M166 118 Q136 116 122 100 Q150 100 166 110 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M168 116 Q150 92 152 74 Q170 88 172 112 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M170 116 Q190 92 208 84 Q196 106 174 114 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M170 120 Q200 118 214 108 Q198 128 172 126 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M166 120 Q140 132 128 128 Q142 114 164 114 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="164" y="96" width="10" height="24" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M174 96 Q202 78 220 88 Q204 106 178 102 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="286" cy="256" rx="42" ry="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="286" cy="216" r="36" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M270 190 Q258 186 250 178 Q266 178 278 186 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M286 184 Q286 172 296 168 Q300 180 292 188 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M300 188 Q314 182 322 186 Q312 196 300 194 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M304 244 q12 -10 22 -2" stroke="#333" stroke-width="2" fill="none"/>` },
+
+{ name: "🐻 大棕熊", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="42" cy="44" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="140" cy="44" r="28" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="260" cy="44" r="28" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="140" cy="44" r="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="260" cy="44" r="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="200" cy="216" rx="96" ry="76" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="200" cy="238" rx="56" ry="52" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="116" cy="196" rx="22" ry="42" fill="#fff" stroke="#333" stroke-width="3.5" transform="rotate(12 116 196)"/>
+  <ellipse class="rg" cx="284" cy="196" rx="22" ry="42" fill="#fff" stroke="#333" stroke-width="3.5" transform="rotate(-12 284 196)"/>
+  <ellipse class="rg" cx="150" cy="288" rx="28" ry="14" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="250" cy="288" rx="28" ry="14" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="292" cy="252" rx="26" ry="14" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <polygon class="rg" points="316,252 338,238 338,266" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle cx="284" cy="250" r="2" fill="#333"/>
+  <circle class="rg" cx="200" cy="108" r="72" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="200" cy="134" rx="34" ry="25" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="200" cy="118" rx="12" ry="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="170" cy="92" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="230" cy="92" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="173" cy="94" r="5" fill="#333"/>
+  <circle cx="233" cy="94" r="5" fill="#333"/>
+  <path d="M200 126 v6 M200 132 q-10 8 -18 2 M200 132 q10 8 18 2" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>` },
+
+{ name: "🦖 霸王龙", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="350" cy="52" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 260 Q100 244 200 254 Q300 264 400 248 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M276 198 Q336 190 362 148 Q368 136 358 140 Q326 172 278 168 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M244 204 Q238 234 240 252 L268 252 Q266 230 272 204 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="256" cy="258" rx="20" ry="8" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M198 206 Q192 234 194 258 L224 258 Q222 232 228 206 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="210" cy="262" rx="22" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="228" cy="188" rx="60" ry="44" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="222" cy="202" rx="40" ry="26" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M180 162 Q160 138 148 122 L170 108 Q192 132 204 158 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M98 104 Q136 84 168 100 Q184 110 180 128 Q176 142 156 144 L104 150 Q92 132 98 104 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M102 150 L156 145 Q166 152 158 162 L108 166 Q96 158 102 150 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M112 148 l7 15 l7 -15 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M132 146 l7 15 l7 -15 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M152 144 l7 15 l7 -15 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="152" cy="112" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="153" cy="112" r="4" fill="#333"/>
+  <path class="rg" d="M178 180 Q162 188 160 202 Q168 208 174 196 Q180 188 188 184 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M206 148 l12 -20 l12 20 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M230 144 l11 -18 l11 18 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M254 148 l10 -16 l10 16 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>` },
+
+{ name: "🦏 三角龙", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="352" cy="46" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 262 Q100 246 200 258 Q300 270 400 252 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M296 190 Q342 192 372 214 Q384 224 368 222 Q340 202 300 206 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="176" y="206" width="30" height="58" rx="13" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="210" y="204" width="30" height="60" rx="13" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="276" y="204" width="30" height="60" rx="13" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="310" y="206" width="30" height="58" rx="13" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="193" cy="262" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="227" cy="262" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="293" cy="262" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="327" cy="262" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="248" cy="186" rx="86" ry="50" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="240" cy="200" rx="58" ry="28" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M188 98 L196 64 L212 96 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M214 106 L238 82 L232 112 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M228 132 L254 120 L234 150 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M104 148 L64 38 L140 128 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M120 132 L110 32 L156 122 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M86 178 L62 152 L104 168 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M64 202 Q50 194 58 184 Q70 176 90 174 Q96 156 112 146 Q104 134 118 122 Q150 104 190 100 Q226 100 236 130 Q244 160 228 186 Q212 208 186 206 Q174 214 156 212 Q120 212 96 208 Q74 206 64 202 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="122" cy="152" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="122" cy="152" r="4" fill="#333"/>
+  <path d="M64 194 q12 8 24 6" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+` },
+
+{ name: "🎃 南瓜", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="48" cy="44" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="0" y="268" width="400" height="32" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="188" y="100" width="16" height="26" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M204 104 q16 -10 8 -24" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse class="rg" cx="250" cy="104" rx="28" ry="12" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(-15 250 104)"/>
+  <ellipse class="rg" cx="196" cy="192" rx="112" ry="82" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="142" cy="192" rx="30" ry="78" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="178" cy="192" rx="24" ry="80" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="216" cy="192" rx="24" ry="80" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="252" cy="192" rx="30" ry="78" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="334" y="212" width="7" height="14" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="336" cy="246" r="28" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="322" cy="246" rx="12" ry="25" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <ellipse class="rg" cx="350" cy="246" rx="12" ry="25" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <path d="M60 274 q6 -14 0 -24 M76 278 q6 -12 0 -20 M120 282 q6 -12 0 -18 M280 276 q-5 -12 0 -20" stroke="#38a169" stroke-width="2.5" fill="none" stroke-linecap="round"/>` },
+
+{ name: "🌷 郁金香", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="350" cy="48" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="0" y="286" width="400" height="14" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="150" y="212" width="102" height="16" rx="7" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M156 228 L246 228 L234 286 L168 286 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M170 244 l10 22 M232 244 l-10 22" stroke="#333" stroke-width="2" fill="none"/>
+  <rect class="rg" x="158" y="158" width="7" height="58" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="207" y="126" width="7" height="90" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="253" y="160" width="7" height="56" rx="3" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M161 196 Q128 186 112 158 Q146 156 164 184 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M211 196 Q244 186 258 158 Q224 156 206 184 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M158 224 Q128 220 114 202 Q140 196 160 210 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M140 118 Q136 152 160 160 Q184 152 180 118 L170 132 L160 114 L150 132 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M188 84 Q184 120 210 128 Q236 120 232 84 L221 98 L210 80 L199 98 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M238 120 Q234 152 258 160 Q282 152 278 120 L268 134 L258 116 L248 134 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>` },
+
+{ name: "🐼 大熊猫", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <rect class="rg" x="0" y="256" width="400" height="44" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="54" y="96" width="14" height="164" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="332" y="120" width="14" height="140" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="40" cy="118" rx="24" ry="10" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-25 40 118)"/>
+  <ellipse class="rg" cx="82" cy="140" rx="24" ry="10" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(25 82 140)"/>
+  <ellipse class="rg" cx="40" cy="168" rx="22" ry="9" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-20 40 168)"/>
+  <ellipse class="rg" cx="322" cy="152" rx="24" ry="10" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-25 322 152)"/>
+  <ellipse class="rg" cx="362" cy="174" rx="24" ry="10" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(25 362 174)"/>
+  <ellipse class="rg" cx="132" cy="238" rx="24" ry="34" fill="#fff" stroke="#333" stroke-width="3.5" transform="rotate(22 132 238)"/>
+  <ellipse class="rg" cx="268" cy="238" rx="24" ry="34" fill="#fff" stroke="#333" stroke-width="3.5" transform="rotate(-22 268 238)"/>
+  <ellipse class="rg" cx="200" cy="238" rx="76" ry="54" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="200" cy="248" rx="50" ry="38" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="158" cy="282" rx="32" ry="15" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="242" cy="282" rx="32" ry="15" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="148" cy="94" r="27" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="252" cy="94" r="27" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="148" cy="94" r="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="252" cy="94" r="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="152" r="70" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="172" cy="144" rx="20" ry="25" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(-18 172 144)"/>
+  <ellipse class="rg" cx="228" cy="144" rx="20" ry="25" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(18 228 144)"/>
+  <circle class="rg" cx="174" cy="146" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="226" cy="146" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="176" cy="148" r="5" fill="#333"/><circle cx="224" cy="148" r="5" fill="#333"/>
+  <path class="rg" d="M190 176 Q200 168 210 176 Q200 191 190 176 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M200 187 Q192 197 182 191 M200 187 Q208 197 218 191" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle class="rg" cx="140" cy="182" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="260" cy="182" r="11" fill="#fff" stroke="#333" stroke-width="2"/>` },
+
+{ name: "🐺 大灰狼", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="352" cy="46" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 262 Q100 246 200 258 Q300 270 400 252 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M316 166 Q360 170 370 206 Q374 230 352 226 Q346 198 312 194 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="184" y="194" width="28" height="66" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="218" y="196" width="28" height="64" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="280" y="196" width="28" height="64" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="312" y="194" width="28" height="66" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="198" cy="260" rx="19" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="232" cy="260" rx="19" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="294" cy="260" rx="19" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="326" cy="260" rx="19" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="250" cy="184" rx="84" ry="46" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="244" cy="198" rx="56" ry="26" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M126 120 L108 66 L160 102 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M160 114 L168 62 L198 100 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M132 150 Q96 148 78 158 Q70 166 80 172 Q98 178 124 176 L136 164 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <ellipse class="rg" cx="78" cy="160" rx="8" ry="7" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="152" cy="150" rx="46" ry="42" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="144" cy="142" r="10" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle cx="144" cy="142" r="4.5" fill="#333"/>
+  <path d="M86 168 q16 8 34 2" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M132 128 q14 -6 26 -2" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+` },
+
+{ name: "🐆 花豹", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="60" cy="50" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 260 Q110 246 200 256 Q310 266 400 250 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M306 168 Q352 162 368 132 Q376 114 358 116 Q338 148 302 176 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M182 196 Q174 232 178 258 L206 258 Q202 230 208 198 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M214 200 Q208 232 212 258 L238 258 Q236 232 240 202 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M280 200 Q276 232 280 258 L306 258 Q302 232 308 202 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M312 198 Q308 232 310 258 L336 258 Q334 232 340 196 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="192" cy="262" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="224" cy="262" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="292" cy="262" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="324" cy="262" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="252" cy="186" rx="78" ry="46" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="246" cy="200" rx="54" ry="26" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="214" cy="166" r="11" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="252" cy="156" r="10" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="290" cy="166" r="11" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="234" cy="196" r="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="272" cy="194" r="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="306" cy="188" r="8" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="200" cy="190" r="8" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M118 120 Q104 92 122 82 Q142 76 148 104 L146 118 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M164 112 Q168 78 186 80 Q202 86 196 118 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M126 150 Q104 150 96 160 Q92 168 102 172 Q118 174 130 168 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="152" cy="148" rx="48" ry="42" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="142" cy="140" r="10" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle cx="142" cy="140" r="4.5" fill="#333"/>
+  <path class="rg" d="M118 158 Q126 152 134 158 Q126 166 118 158 Z" fill="#fff" stroke="#333" stroke-width="2.2"/>
+  <path d="M126 164 v5 M126 169 q-8 6 -14 0 M126 169 q8 6 14 0" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M104 152 l-16 2 M104 162 l-16 4 M188 142 l14 -4 M188 152 l14 2" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+` },
+
+{ name: "🐊 大鳄鱼", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="344" cy="50" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 258 Q100 244 200 254 Q300 264 400 250 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M288 202 Q332 204 368 226 Q382 234 368 236 Q340 218 292 218 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M144 186 L158 154 L172 186 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M176 182 L190 150 L204 182 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M208 180 L222 148 L236 180 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M240 180 L254 150 L268 180 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M272 182 L284 156 L296 182 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="152" y="216" width="28" height="50" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="186" y="218" width="28" height="48" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="248" y="218" width="28" height="48" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="282" y="216" width="28" height="50" rx="12" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M40 196 L152 190 Q168 192 168 204 L152 208 L44 210 Q32 202 40 196 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M42 214 L154 209 Q166 210 166 219 L152 222 L46 226 Q34 220 42 214 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M56 209 l10 13 l10 -13 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M88 208 l10 13 l10 -13 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M120 206 l10 13 l10 -13 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M60 195 l10 -13 l10 13 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M92 194 l10 -13 l10 13 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M104 184 Q92 168 108 160 Q124 154 134 166 Q140 180 126 186 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M108 190 Q118 176 152 174 L286 180 Q316 184 316 202 Q314 226 286 230 L140 230 Q110 224 108 208 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M136 208 Q190 200 250 204" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle class="rg" cx="112" cy="172" r="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="112" cy="172" r="3.2" fill="#333"/>
+  <circle class="rg" cx="46" cy="200" r="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+` },
+
+{ name: "🦣 猛犸象", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="352" cy="46" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 264 Q100 248 200 258 Q300 268 400 252 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M124 186 Q96 196 74 182 Q60 174 66 166 Q84 180 106 176 Q120 172 128 178 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M150 110 Q120 118 112 150 Q110 172 116 188 Q112 208 100 230 Q92 248 104 256 Q118 260 124 246 Q132 228 148 214 L172 218 Q176 236 178 250 L206 250 Q206 232 204 220 L262 220 Q268 236 270 250 L298 250 Q298 232 296 220 Q318 214 328 196 Q338 168 330 144 Q320 120 290 114 Q240 104 190 106 Q168 106 150 110 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="192" cy="252" rx="18" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="284" cy="252" rx="18" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="164" cy="152" rx="24" ry="28" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="122" cy="142" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="122" cy="142" r="4" fill="#333"/>
+  <path d="M112 170 q12 6 22 2" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M216 118 q18 10 20 26 M240 112 q20 10 22 28 M266 110 q18 10 20 26" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M330 178 q14 6 24 20" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+` },
+
+{ name: "🦎 剑龙", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="352" cy="46" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 264 Q100 248 200 258 Q300 268 400 252 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M136 178 L164 96 L192 178 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M186 174 L216 88 L244 174 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M238 174 L264 100 L290 174 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M284 178 L306 124 L326 178 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M292 202 Q338 204 372 224 Q384 232 370 234 Q342 218 294 218 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M348 206 L366 180 L372 210 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M364 218 L384 202 L384 226 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="178" y="204" width="30" height="58" rx="13" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="214" y="204" width="30" height="58" rx="13" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="272" y="204" width="30" height="58" rx="13" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="308" y="204" width="30" height="58" rx="13" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="192" cy="266" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="228" cy="266" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="286" cy="266" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="322" cy="266" rx="20" ry="9" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M100 208 Q96 178 132 172 L156 180 Q136 192 128 210 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M96 208 Q102 172 152 166 L272 168 Q312 172 318 198 Q310 218 276 218 L136 218 Q104 216 96 208 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="84" cy="184" rx="32" ry="22" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M58 194 Q50 200 58 204 Q68 202 66 194 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="90" cy="176" r="7" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="90" cy="176" r="3.2" fill="#333"/>
+  <path d="M60 198 q10 4 18 0" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+` },
+
+{ name: "🦅 翼龙", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="62" cy="50" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="320" cy="60" rx="42" ry="22" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="268" cy="102" rx="30" ry="16" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="70" cy="250" rx="36" ry="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M182 150 Q130 96 60 26 Q42 10 44 44 Q48 104 104 154 Q140 182 176 176 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M232 148 Q288 92 356 30 Q376 14 372 48 Q368 108 310 156 Q272 182 238 174 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M104 132 Q80 84 44 40" stroke="#333" stroke-width="2" fill="none"/>
+  <path class="rg" d="M308 132 Q332 84 368 42" stroke="#333" stroke-width="2" fill="none"/>
+  <ellipse class="rg" cx="206" cy="172" rx="34" ry="46" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="206" cy="184" rx="18" ry="28" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M206 210 Q216 244 250 268 Q262 276 250 280 Q210 278 194 240 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="206" cy="112" r="30" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M180 92 Q146 62 130 74 Q158 88 182 108 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="196" cy="106" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle cx="196" cy="106" r="4" fill="#333"/>
+  <path class="rg" d="M196 128 L192 148 L232 138 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="176" cy="212" rx="12" ry="9" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(-25 176 212)"/>
+  <ellipse class="rg" cx="236" cy="212" rx="12" ry="9" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(25 236 212)"/>` },
+
+{ name: "🍌 香蕉串", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="348" cy="56" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="0" y="258" width="400" height="42" fill="#fff" stroke="#333" stroke-width="2"/>
+  <ellipse class="rg" cx="196" cy="266" rx="116" ry="18" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M92 120 C112 166 146 186 180 186 C214 186 248 166 268 120 C238 148 209 158 180 158 C151 158 122 148 92 120 Z" fill="#fff" stroke="#333" stroke-width="3.2" transform="rotate(-8 268 120)"/>
+  <path class="rg" d="M92 120 C112 166 146 186 180 186 C214 186 248 166 268 120 C238 148 209 158 180 158 C151 158 122 148 92 120 Z" fill="#fff" stroke="#333" stroke-width="3.2" transform="rotate(4 268 120)"/>
+  <path class="rg" d="M92 120 C112 166 146 186 180 186 C214 186 248 166 268 120 C238 148 209 158 180 158 C151 158 122 148 92 120 Z" fill="#fff" stroke="#333" stroke-width="3.2" transform="rotate(16 268 120)"/>
+  <path class="rg" d="M92 120 C112 166 146 186 180 186 C214 186 248 166 268 120 C238 148 209 158 180 158 C151 158 122 148 92 120 Z" fill="#fff" stroke="#333" stroke-width="3.2" transform="rotate(28 268 120)"/>
+  <path class="rg" d="M92 120 C112 166 146 186 180 186 C214 186 248 166 268 120 C238 148 209 158 180 158 C151 158 122 148 92 120 Z" fill="#fff" stroke="#333" stroke-width="3.2" transform="rotate(40 268 120)"/>
+  <path class="rg" d="M258 118 Q262 96 282 88 Q296 82 300 94 Q284 102 276 122 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M286 86 Q316 54 350 62 Q360 70 348 82 Q318 84 296 100 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="64" cy="198" r="9" fill="#fff" stroke="#333" stroke-width="2"/>` },
+
+{ name: "🥦 西兰花", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="60" cy="52" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <rect class="rg" x="0" y="266" width="400" height="34" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M176 268 L178 196 Q200 178 222 196 L224 268 Q200 278 176 268 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M180 234 Q150 230 136 210 Q164 204 182 220 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M220 234 Q250 230 264 210 Q236 204 218 220 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="140" cy="126" r="38" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="196" cy="104" r="42" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="252" cy="122" r="36" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="168" cy="156" r="30" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="228" cy="154" r="30" fill="#fff" stroke="#333" stroke-width="3"/>
+  <circle class="rg" cx="106" cy="154" r="24" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="292" cy="150" r="24" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="200" cy="66" r="26" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="160" cy="110" r="14" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="232" cy="106" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="120" cy="136" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="278" cy="132" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="176" cy="80" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="224" cy="82" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M184 264 Q156 258 144 240 Q170 234 186 250 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M216 264 Q244 258 256 240 Q230 234 214 250 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>` },
+
+{ name: "🌽 玉米", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="342" cy="56" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="310" cy="112" rx="34" ry="18" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="0" y="262" width="400" height="38" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M200 262 Q190 200 196 150" stroke="#333" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M196 240 Q120 230 96 176 Q156 168 190 214 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M202 232 Q278 222 302 168 Q242 160 208 206 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M194 210 Q134 196 118 152 Q170 152 196 188 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="200" cy="140" rx="46" ry="82" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="166" y="92" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="186" y="92" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="206" y="92" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="176" y="112" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="196" y="112" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="216" y="112" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="162" y="132" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="182" y="132" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="202" y="132" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="222" y="132" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="170" y="152" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="190" y="152" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="210" y="152" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="176" y="172" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="196" y="172" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <rect class="rg" x="216" y="172" width="16" height="14" rx="4" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <path class="rg" d="M196 60 Q176 32 186 16 Q204 26 206 60 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M212 62 Q232 30 250 22 Q250 46 220 68 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>` },
+
+{ name: "🍆 茄子", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="60" cy="52" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="196" cy="288" rx="100" ry="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M198 120 Q170 142 162 188 Q154 240 184 266 Q200 278 216 264 Q248 238 240 188 Q232 142 204 120 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path d="M178 164 Q170 204 184 240" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M222 148 Q234 184 228 220" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M198 130 Q174 114 150 118 Q156 140 184 148 Q202 152 214 144 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M206 130 Q232 114 256 120 Q250 144 222 150 Q208 154 196 146 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M202 118 Q206 94 224 80 Q228 94 214 110 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M224 80 Q258 64 278 88 Q252 106 224 94 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="316" cy="218" rx="38" ry="62" fill="#fff" stroke="#333" stroke-width="3.5" transform="rotate(10 316 218)"/>
+  <path class="rg" d="M298 162 Q276 150 260 158 Q274 180 298 180 Q312 180 320 170 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M300 154 Q306 134 322 124 Q326 138 312 154 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M322 124 Q352 110 368 132 Q344 150 322 138 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="290" cy="250" rx="9" ry="17" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(10 290 250)"/>
+  <ellipse class="rg" cx="340" cy="242" rx="8" ry="15" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(10 340 242)"/>
+  <ellipse class="rg" cx="190" cy="200" rx="16" ry="36" fill="#fff" stroke="#333" stroke-width="2" transform="rotate(-5 190 200)"/>
+` },
+
+{ name: "🌹 玫瑰花", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="356" cy="46" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M160 200 Q156 226 144 260 Q200 278 256 260 Q244 226 240 200 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <rect class="rg" x="154" y="184" width="92" height="18" rx="7" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M168 218 q10 18 12 34 M232 218 q-10 18 -12 34" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M200 186 L200 122" stroke="#333" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M198 158 Q166 150 152 118 Q188 116 200 146 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M202 140 Q234 132 248 102 Q212 100 200 128 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M200 44 Q240 42 250 72 Q258 102 232 118 Q206 132 180 122 Q154 112 152 82 Q150 48 200 44 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M196 56 Q236 56 240 86 Q244 114 214 120 Q190 124 178 108 Q168 94 176 74 Q182 58 196 56 Z" fill="#fff" stroke="#333" stroke-width="2.8"/>
+  <path class="rg" d="M202 72 Q226 74 228 94 Q230 112 208 116 Q192 116 190 100 Q188 82 202 72 Z" fill="#fff" stroke="#333" stroke-width="2.4"/>
+  <path d="M200 84 q12 0 12 9 q0 8 -9 9 q-9 1 -10 -6 q-1 -8 7 -9" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M156 52 Q138 44 134 58 Q132 72 148 76 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M246 112 Q264 118 266 134 Q258 146 244 140 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M316 164 L316 240" stroke="#333" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M316 200 Q290 194 280 172 Q308 170 318 190 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M318 178 Q344 172 354 152 Q326 148 316 168 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M316 128 Q316 106 336 100 Q356 106 356 128 Q356 150 336 156 Q316 150 316 128 Z" fill="#fff" stroke="#333" stroke-width="2.8"/>
+  <path class="rg" d="M334 114 Q346 116 348 128 Q348 140 336 144 Q326 140 326 128 Q326 116 334 114 Z" fill="#fff" stroke="#333" stroke-width="2.2"/>
+  <ellipse class="rg" cx="336" cy="246" rx="14" ry="20" fill="#fff" stroke="#333" stroke-width="2.5"/>
+` },
+
+{ name: "🌳 大树", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="62" cy="52" r="26" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M0 258 Q100 244 200 254 Q300 266 400 250 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M190 198 Q160 168 138 136" stroke="#333" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M212 198 Q244 168 266 136" stroke="#333" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M200 196 V146" stroke="#333" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M178 272 Q186 224 188 188 L212 188 Q214 224 224 272 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <path class="rg" d="M178 268 q-20 2 -30 12 q22 2 32 -6 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M224 268 q20 2 30 12 q-22 2 -32 -6 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M192 254 q4 -18 0 -32 M212 256 q-4 -18 0 -30" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle class="rg" cx="200" cy="102" r="64" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="140" cy="130" r="44" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="262" cy="128" r="44" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="154" cy="66" r="32" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="248" cy="64" r="32" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="200" cy="42" r="30" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <circle class="rg" cx="168" cy="114" r="13" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="236" cy="110" r="12" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="200" cy="140" r="11" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="150" cy="150" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="256" cy="148" r="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M330 66 Q342 54 354 60 Q358 72 346 74 Q336 74 330 66 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M346 62 l16 -8 l-6 14 Z" fill="#fff" stroke="#333" stroke-width="1.8"/>
+  <circle cx="338" cy="65" r="2" fill="#333"/>
+  <path class="rg" d="M84 250 q6 -18 12 0 q6 -18 12 0 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M300 246 q6 -18 12 0 q6 -18 12 0 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+` },
+
+{ name: "🪴 小盆栽", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <rect class="rg" x="248" y="34" width="110" height="110" rx="6" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path d="M303 34 v110 M248 89 h110" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="0" y="238" width="400" height="62" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="132" y="182" width="136" height="22" rx="8" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M142 204 L258 204 L238 282 Q200 288 162 282 Z" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M168 222 l14 14 l-14 14 l-14 -14 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M232 222 l14 14 l-14 14 l-14 -14 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M200 234 l12 14 l-12 14 l-12 -14 Z" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M200 178 Q200 120 200 96" stroke="#333" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M164 178 Q150 128 108 108" stroke="#333" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M236 178 Q250 128 292 108" stroke="#333" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path class="rg" d="M200 104 Q166 92 158 56 Q196 62 206 96 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M202 108 Q236 96 246 62 Q206 66 198 100 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M112 112 Q78 108 66 80 Q102 78 118 100 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M108 122 Q76 132 56 118 Q78 100 100 106 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M288 112 Q322 108 334 80 Q298 78 282 100 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M292 122 Q324 132 344 118 Q322 100 300 106 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M164 152 Q138 148 132 124 Q156 126 168 144 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M236 152 Q262 148 268 124 Q244 126 232 144 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="200" cy="76" r="20" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="200" cy="76" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="66" cy="56" r="16" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="66" cy="56" r="7" fill="#fff" stroke="#333" stroke-width="2"/>` },
+
+{ name: "🚌 公交车", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="60" cy="48" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="334" cy="62" rx="40" ry="20" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="0" y="250" width="400" height="50" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M30 236 L30 128 Q30 100 62 96 L338 96 Q370 100 370 128 L370 236 Z" fill="#fff" stroke="#333" stroke-width="4"/>
+  <rect class="rg" x="44" y="110" width="312" height="34" rx="8" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="54" y="118" width="74" height="18" rx="4" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="136" y="118" width="20" height="18" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="52" y="156" width="88" height="52" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="150" y="156" width="88" height="52" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="248" y="156" width="60" height="84" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M248 200 h60" stroke="#333" stroke-width="2.5"/>
+  <rect class="rg" x="30" y="212" width="340" height="10" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="106" cy="240" r="30" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="106" cy="240" r="13" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="300" cy="240" r="30" fill="#fff" stroke="#333" stroke-width="4"/>
+  <circle class="rg" cx="300" cy="240" r="13" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="46" cy="196" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="354" cy="196" r="9" fill="#fff" stroke="#333" stroke-width="2"/>
+  <rect class="rg" x="140" y="104" width="60" height="12" rx="3" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path d="M46 236 h308" stroke="#333" stroke-width="2"/>` },
+
+{ name: "🚁 直升机", svg: `
+  <rect class="rg" x="0" y="0" width="400" height="300" fill="#fff"/>
+  <circle class="rg" cx="56" cy="50" r="24" fill="#fff" stroke="#333" stroke-width="3"/>
+  <ellipse class="rg" cx="336" cy="52" rx="44" ry="22" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M0 250 Q90 196 172 240 Q250 282 320 248 Q360 228 400 242 L400 300 L0 300 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="228" cy="62" rx="132" ry="8" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(-22 228 62)"/>
+  <ellipse class="rg" cx="228" cy="62" rx="132" ry="8" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(22 228 62)"/>
+  <rect class="rg" x="222" y="60" width="12" height="38" rx="4" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M158 158 Q120 152 98 132 L108 116 Q144 130 170 140 Z" fill="#fff" stroke="#333" stroke-width="3"/>
+  <path class="rg" d="M108 116 Q88 96 100 80 Q118 94 124 110 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <ellipse class="rg" cx="100" cy="112" rx="6" ry="26" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(30 100 112)"/>
+  <ellipse class="rg" cx="100" cy="112" rx="6" ry="26" fill="#fff" stroke="#333" stroke-width="2.5" transform="rotate(-60 100 112)"/>
+  <ellipse class="rg" cx="228" cy="172" rx="84" ry="56" fill="#fff" stroke="#333" stroke-width="4"/>
+  <ellipse class="rg" cx="228" cy="182" rx="54" ry="34" fill="#fff" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="274" cy="146" r="32" fill="#fff" stroke="#333" stroke-width="3.5"/>
+  <path class="rg" d="M268 124 Q294 128 301 146 Q288 162 266 158 Q255 141 268 124 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M271 136 q16 4 21 16" stroke="#333" stroke-width="2" fill="none"/>
+  <rect class="rg" x="184" y="156" width="46" height="48" rx="6" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path d="M184 180 h46" stroke="#333" stroke-width="2"/>
+  <circle class="rg" cx="300" cy="184" r="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <path class="rg" d="M186 224 L180 242 L198 242 L202 224 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M270 224 L264 242 L282 242 L286 224 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <path class="rg" d="M158 244 L304 244 L304 254 L158 254 Z" fill="#fff" stroke="#333" stroke-width="2.5"/>
+  <circle class="rg" cx="228" cy="62" r="9" fill="#fff" stroke="#333" stroke-width="2.5"/>` }
+];
+
+/* ============ 状态 ============ */
+const board = document.getElementById("board");
+const picsEl = document.getElementById("pics");
+const paletteEl = document.getElementById("palette");
+const curColorEl = document.getElementById("curColor");
+const curNameEl = document.getElementById("curName");
+const btnEraser = document.getElementById("btnEraser");
+
+let color = "#ff6b9d", colorName = "粉红";
+let eraser = false, soundOn = true;
+let undoStack = [];
+let audioCtx = null;
+
+/* ============ 分类导航 ============ */
+const CATS = [
+  { id: "animal",   icon: "🐾", label: "动物",     en: "Animals",   color: "#ff7b93", subs: ["小动物", "猛兽", "远古动物"] },
+  { id: "plant",    icon: "🌿", label: "植物",     en: "Plants",    color: "#40c057", subs: ["水果", "蔬菜", "花草"] },
+  { id: "vehicle",  icon: "🚂", label: "交通工具", en: "Vehicles",  color: "#339af0", subs: [] },
+  { id: "building", icon: "🏠", label: "建筑",     en: "Buildings", color: "#ff922b", subs: [] }
+];
+
+const SUB_EN = {
+  "小动物": "Small animals", "猛兽": "Wild beasts", "远古动物": "Dinosaurs",
+  "水果": "Fruits", "蔬菜": "Vegetables", "花草": "Flowers"
+};
+
+// 图案英文名（去掉 emoji 后的中文名 -> 英文）
+const PIC_EN = {
+  "小花猫": "Kitty", "小兔子": "Bunny", "海底世界": "Underwater world", "花蝴蝶": "Butterfly",
+  "小鸭子": "Duckling", "大熊猫": "Panda",
+  "小狮子": "Lion cub", "小老虎": "Tiger cub", "大棕熊": "Brown bear",
+  "大灰狼": "Gray wolf", "花豹": "Leopard", "大鳄鱼": "Crocodile",
+  "长颈龙": "Brontosaurus", "霸王龙": "T-Rex", "三角龙": "Triceratops",
+  "猛犸象": "Mammoth", "剑龙": "Stegosaurus", "翼龙": "Pterodactyl",
+  "大西瓜": "Watermelon", "小草莓": "Strawberry", "大菠萝": "Pineapple",
+  "葡萄串": "Grapes", "苹果树": "Apple tree", "香蕉串": "Bananas",
+  "胡萝卜": "Carrot", "番茄": "Tomato", "南瓜": "Pumpkin",
+  "西兰花": "Broccoli", "玉米": "Corn", "茄子": "Eggplant",
+  "向日葵": "Sunflower", "小仙人掌": "Cactus", "郁金香": "Tulip",
+  "玫瑰花": "Rose", "大树": "Big tree", "小盆栽": "Potted plant",
+  "小汽车": "Car", "小火车": "Train", "大飞机": "Airplane", "大轮船": "Ship",
+  "公交车": "Bus", "直升机": "Helicopter",
+  "小房子": "House", "宝藏岛": "Treasure island", "幼儿园": "Kindergarten",
+  "小学": "Primary school", "大商场": "Shopping mall",
+  "剖面小楼": "Dollhouse", "海底基地": "Underwater base"
+};
+
+/* 中英文朗读：先中文后英文，用系统自带的语音合成（防哑火 + 低间隔版） */
+let vZh = null, vEn = null, spkTimer = null, spkSeq = 0, spkStartAt = 0;
+function loadVoices() {
+  if (!("speechSynthesis" in window)) return;
+  const vs = speechSynthesis.getVoices();
+  const zh = vs.filter(v => v.lang.toLowerCase().startsWith("zh"));
+  const en = vs.filter(v => v.lang.toLowerCase().startsWith("en"));
+  // 优先“本地”语音（远端网络语音每句都要联网，间隔和延迟都大）
+  vZh = zh.find(v => v.localService && v.lang.toLowerCase().startsWith("zh-cn"))
+     || zh.find(v => v.localService) || zh[0] || null;
+  vEn = en.find(v => v.localService && v.lang.toLowerCase().startsWith("en-us"))
+     || en.find(v => v.localService) || en[0] || null;
+}
+function speakZhEn(zh, en) {
+  if (!soundOn || !("speechSynthesis" in window)) return;
+  try {
+    spkSeq++;
+    const my = spkSeq;
+    clearTimeout(spkTimer);
+    // cancel() + resume() 一起调：Chrome 里 cancel 后引擎偶发进入 paused/假死状态，
+    // 之后的 speak 会被整体吞掉（表现为“怎么点都没声音”），resume() 负责把它叫醒
+    speechSynthesis.cancel();
+    speechSynthesis.resume();
+    // cancel() 后同一帧 speak() 在 Chrome 里可能被吞掉，推迟一帧更稳
+    spkTimer = setTimeout(() => {
+      if (my !== spkSeq) return;
+      const uz = new SpeechSynthesisUtterance(zh);
+      uz.lang = "zh-CN"; uz.rate = 1.2;
+      if (vZh) uz.voice = vZh;
+      uz.onstart = () => { if (my === spkSeq) spkStartAt = Date.now(); };
+      const ue = new SpeechSynthesisUtterance(en);
+      ue.lang = "en-US"; ue.rate = 1.1;
+      if (vEn) ue.voice = vEn;
+      // 同一队列内两句无缝衔接（这是中英文间隔最小的方式，中间不再插任何延迟）
+      speechSynthesis.speak(uz);
+      speechSynthesis.speak(ue);
+    }, 30);
+  } catch (e) { /* 朗读失败不影响游戏 */ }
+}
+// 兜底 watchdog：若引擎卡死（一句短语 12 秒还没结束），强制 cancel+resume 复位，
+// 下一次点击就能恢复正常发声
+if ("speechSynthesis" in window) {
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+  setInterval(() => {
+    try {
+      if (speechSynthesis.speaking && spkStartAt && Date.now() - spkStartAt > 12000) {
+        speechSynthesis.cancel();
+        speechSynthesis.resume();
+        spkStartAt = 0;
+      }
+    } catch (e) {}
+  }, 2000);
+}
+// 首次交互时唤醒音频会话（真实手势内调用，安全且无卡死风险），首句朗读更快出声
+let _audioWoke = false;
+document.addEventListener("pointerdown", () => {
+  if (_audioWoke) return;
+  _audioWoke = true;
+  try { speechSynthesis.resume(); } catch (e) {}
+}, { capture: true });
+
+// 点游戏标题朗读名称
+document.getElementById("gameTitle").onclick = () => speakZhEn("涂色乐园", "Coloring Wonderland");
+// 点底部提示文字朗读玩法
+document.getElementById("tipLine").onclick = () =>
+  speakZhEn("选一个颜色，再点图案上想涂的地方吧", "Pick a color, then tap the picture to color it");
+
+const CAT_OF = {
+  "🐱 小花猫": ["animal", "小动物"], "🐰 小兔子": ["animal", "小动物"], "🐠 海底世界": ["animal", "小动物"],
+  "🦋 花蝴蝶": ["animal", "小动物"], "🦆 小鸭子": ["animal", "小动物"], "🐼 大熊猫": ["animal", "小动物"],
+  "🦁 小狮子": ["animal", "猛兽"], "🐯 小老虎": ["animal", "猛兽"], "🐻 大棕熊": ["animal", "猛兽"],
+  "🐺 大灰狼": ["animal", "猛兽"], "🐆 花豹": ["animal", "猛兽"], "🐊 大鳄鱼": ["animal", "猛兽"],
+  "🦕 长颈龙": ["animal", "远古动物"], "🦖 霸王龙": ["animal", "远古动物"], "🦏 三角龙": ["animal", "远古动物"],
+  "🦣 猛犸象": ["animal", "远古动物"], "🦎 剑龙": ["animal", "远古动物"], "🦅 翼龙": ["animal", "远古动物"],
+  "🍉 大西瓜": ["plant", "水果"], "🍓 小草莓": ["plant", "水果"], "🍍 大菠萝": ["plant", "水果"],
+  "🍇 葡萄串": ["plant", "水果"], "🍎 苹果树": ["plant", "水果"], "🍌 香蕉串": ["plant", "水果"],
+  "🥕 胡萝卜": ["plant", "蔬菜"], "🍅 番茄": ["plant", "蔬菜"], "🎃 南瓜": ["plant", "蔬菜"],
+  "🥦 西兰花": ["plant", "蔬菜"], "🌽 玉米": ["plant", "蔬菜"], "🍆 茄子": ["plant", "蔬菜"],
+  "🌻 向日葵": ["plant", "花草"], "🌵 小仙人掌": ["plant", "花草"], "🌷 郁金香": ["plant", "花草"],
+  "🌹 玫瑰花": ["plant", "花草"], "🌳 大树": ["plant", "花草"], "🪴 小盆栽": ["plant", "花草"],
+  "🚗 小汽车": ["vehicle", ""], "🚂 小火车": ["vehicle", ""], "✈️ 大飞机": ["vehicle", ""], "🚢 大轮船": ["vehicle", ""],
+  "🚌 公交车": ["vehicle", ""], "🚁 直升机": ["vehicle", ""],
+  "🏠 小房子": ["building", ""], "🧸 幼儿园": ["building", ""], "🏫 小学": ["building", ""],
+  "🏬 大商场": ["building", ""], "🏢 剖面小楼": ["building", ""], "🔬 海底基地": ["building", ""],
+  "🗺️ 宝藏岛": ["building", ""]
+};
+
+PICTURES.forEach(p => {
+  const m = CAT_OF[p.name] || ["animal", "小动物"];
+  p.cat = m[0]; p.sub = m[1];
+});
+
+const catsEl = document.getElementById("cats");
+const subsEl = document.getElementById("subs");
+let curCat = "animal", curSub = "小动物", curIdx = 0;
+
+function renderNav() {
+  catsEl.innerHTML = "";
+  subsEl.innerHTML = "";
+  CATS.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "cat-btn" + (c.id === curCat ? " active" : "");
+    b.style.setProperty("--c", c.color);
+    const ico = document.createElement("span");
+    ico.className = "ico";
+    ico.textContent = c.icon;
+    ico.style.background = c.id === curCat ? "rgba(255,255,255,.3)" : c.color + "26";
+    const lb = document.createElement("span");
+    lb.textContent = c.label;
+    b.appendChild(ico); b.appendChild(lb);
+    b.onclick = () => {
+      curCat = c.id;
+      curSub = c.subs.length ? c.subs[0] : "";
+      renderNav();
+      speakZhEn(c.label, c.en);
+    };
+    catsEl.appendChild(b);
+  });
+  const cat = CATS.find(c => c.id === curCat);
+  subsEl.style.background = cat ? cat.color + "14" : "transparent";
+  if (cat && cat.subs.length) {
+    cat.subs.forEach(s => {
+      const b = document.createElement("button");
+      b.className = "sub-btn" + (s === curSub ? " active" : "");
+      b.style.setProperty("--c", cat.color);
+      b.textContent = s;
+      b.onclick = () => { curSub = s; renderNav(); speakZhEn(s, SUB_EN[s] || s); };
+      subsEl.appendChild(b);
+    });
+  }
+  // 若当前选中的图案不在新分类里，自动跳到该分类第一张
+  const cur = PICTURES[curIdx];
+  if (!cur || cur.cat !== curCat || (curSub && cur.sub !== curSub)) {
+    curIdx = PICTURES.findIndex(p => p.cat === curCat && (!curSub || p.sub === curSub));
+    if (curIdx >= 0) loadPicture(curIdx);
+  }
+  renderPics();
+}
+
+function renderPics() {
+  picsEl.innerHTML = "";
+  const color = (CATS.find(c => c.id === curCat) || {}).color || "#ff6b9d";
+  PICTURES.forEach((p, i) => {
+    if (p.cat !== curCat) return;
+    if (curSub && p.sub !== curSub) return;
+    const b = document.createElement("button");
+    b.className = "pic-btn" + (i === curIdx ? " active" : "");
+    b.style.setProperty("--c", color);
+    b.innerHTML = '<span class="thumb"><svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">' + p.svg + '</svg></span>'
+                + '<span class="plabel">' + p.name + '</span>'
+                + '<span class="spk" title="听读音">🔊</span>';
+    const zh = p.name.replace(/^\S+\s*/, "");
+    const en = PIC_EN[zh] || zh;
+    b.querySelector(".spk").onclick = (ev) => {
+      ev.stopPropagation();
+      speakZhEn(zh, en);
+    };
+    b.onclick = () => {
+      curIdx = i; loadPicture(i); renderPics();
+      speakZhEn(zh, en);
+    };
+    picsEl.appendChild(b);
+  });
+}
+
+COLORS.forEach(([hex, name, en]) => {
+  const s = document.createElement("div");
+  s.className = "swatch";
+  s.style.background = hex;
+  s.title = name + " " + en;
+  s.onclick = () => {
+    color = hex; colorName = name;
+    eraser = false; btnEraser.classList.remove("on");
+    curColorEl.style.background = hex;
+    curColorEl.style.boxShadow = "0 0 0 3px #ccc";
+    curNameEl.textContent = name;
+    document.querySelectorAll(".swatch").forEach(x => x.classList.remove("active"));
+    s.classList.add("active");
+    speakZhEn(name, en);
+  };
+  if (hex === "#ff6b9d") s.classList.add("active");
+  paletteEl.appendChild(s);
+});
+
+function loadPicture(i) {
+  board.innerHTML = PICTURES[i].svg + "</svg>";
+  undoStack = [];
+  board.querySelectorAll(".rg").forEach(el => {
+    el.dataset.def = el.getAttribute("fill") || "#ffffff";
+    el.addEventListener("click", onFill);
+  });
+}
+
+/* ============ 涂色 ============ */
+function onFill(e) {
+  const el = e.currentTarget;
+  const from = el.getAttribute("fill");
+  const to = eraser ? el.dataset.def : color;
+  if (from === to) return;
+  el.setAttribute("fill", to);
+  undoStack.push([{ el, from }]);
+  if (soundOn) popSound();
+  sparkle(e.clientX, e.clientY);
+  if (eraser) speakZhEn("橡皮擦", "Eraser");
+  else {
+    const c = COLORS.find(x => x[0] === color);
+    speakZhEn(colorName, c ? c[2] : colorName);
+  }
+}
+
+/* ============ 工具按钮 ============ */
+btnEraser.onclick = () => {
+  eraser = !eraser;
+  btnEraser.classList.toggle("on", eraser);
+  curColorEl.style.background = eraser ? "repeating-linear-gradient(45deg,#eee 0 6px,#ccc 6px 12px)" : color;
+  curNameEl.textContent = eraser ? "橡皮擦" : colorName;
+  eraser ? speakZhEn("橡皮擦", "Eraser") : speakZhEn("画笔", "Paint brush");
+};
+document.getElementById("btnUndo").onclick = () => {
+  const batch = undoStack.pop();
+  if (batch) batch.forEach(({ el, from }) => el.setAttribute("fill", from));
+  speakZhEn("撤销", "Undo");
+};
+document.getElementById("btnClear").onclick = () => {
+  const batch = [];
+  board.querySelectorAll(".rg").forEach(el => {
+    const from = el.getAttribute("fill");
+    if (from !== el.dataset.def) { batch.push({ el, from }); el.setAttribute("fill", el.dataset.def); }
+  });
+  if (batch.length) undoStack.push(batch);
+  speakZhEn("全部重来", "Clear all");
+};
+document.getElementById("btnSound").onclick = function () {
+  // 关闭前先把提示念完，再静音；打开时直接念
+  if (soundOn) speakZhEn("声音关", "Sound off");
+  soundOn = !soundOn;
+  this.textContent = soundOn ? "🔊 声音开" : "🔇 声音关";
+  if (soundOn) setTimeout(() => speakZhEn("声音开", "Sound on"), 300);
+};
+document.getElementById("btnSave").onclick = () => {
+  speakZhEn("保存我的画", "Save my picture");
+  const clone = board.cloneNode(true);
+  const data = new XMLSerializer().serializeToString(clone);
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement("canvas");
+    c.width = 1200; c.height = 900;
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 1200, 900);
+    ctx.drawImage(img, 0, 0, 1200, 900);
+    const a = document.createElement("a");
+    a.download = "我的涂色作品.png";
+    a.href = c.toDataURL("image/png");
+    a.click();
+  };
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(data);
+};
+
+/* ============ 音效 & 特效 ============ */
+function popSound() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(600 + Math.random() * 300, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.12);
+    g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.16);
+  } catch (e) {}
+}
+function sparkle(x, y) {
+  for (let i = 0; i < 6; i++) {
+    const s = document.createElement("span");
+    s.className = "sparkle";
+    s.textContent = Math.random() < 0.5 ? "✨" : "💫";
+    s.style.left = x + "px"; s.style.top = y + "px";
+    s.style.setProperty("--dx", (Math.random() * 60 - 30) + "px");
+    s.style.setProperty("--dy", (-30 - Math.random() * 40) + "px");
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 700);
+  }
+}
+
+loadPicture(0);
+renderNav();
+</script>
+</body>
+</html>
