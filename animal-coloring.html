@@ -152,6 +152,8 @@
   #btnClear { background: #ff6b6b; }
   #btnSave { background: #51cf66; flex: 1 1 100%; font-size: 17px; }
   #btnSound { background: #748ffc; }
+  #btnJoin { background: #9775fa; opacity: .55; flex: 1 1 100%; padding: 7px 8px; font-size: 13px; }
+  #btnJoin.on { background: #7048e8; opacity: 1; box-shadow: 0 0 0 3px #e5dbff; }
   .tip { font-size: 13px; color: #999; text-align: center; cursor: pointer; user-select: none; }
   .tip:hover { color: #666; }
   .sparkle {
@@ -210,6 +212,7 @@
         <button class="tool-btn" id="btnUndo" data-page-node-id="1rV9axtFpKLIn3GccyrKiU">↩️ 撤销</button>
         <button class="tool-btn" id="btnClear" data-page-node-id="eu5eYHp5UZNZ7rCeNRDv9L">🗑️ 全部重来</button>
         <button class="tool-btn" id="btnSound" data-page-node-id="0lDeW4hQ2JaQfEowLJ1EPS">🔊 声音开</button>
+        <button class="tool-btn" id="btnJoin" title="连读：中英文一句读完，中间不停顿">🔗 连读</button>
         <button class="tool-btn" id="btnSave" data-page-node-id="kjbMQ4kifRXBfSb7xBbUMT">💾 保存我的画</button>
       </div>
       <div class="tip" id="tipLine" data-page-node-id="5Tbzp15uUg0Z3TsLrp31nK">选一个颜色，再点图案上想涂的地方吧！ <span class="t-speaker">🔊</span></div>
@@ -1668,16 +1671,28 @@ const PIC_EN = {
 
 /* 中英文朗读：先中文后英文，用系统自带的语音合成（防哑火 + 低间隔版） */
 let vZh = null, vEn = null, spkTimer = null, spkSeq = 0, spkStartAt = 0;
+// 连读模式：中文和英文合成一句读完，彻底消除换语音造成的中途停顿（默认开，可点按钮关掉）
+let joinMode = localStorage.getItem("ct_join") !== "0";
 function loadVoices() {
   if (!("speechSynthesis" in window)) return;
   const vs = speechSynthesis.getVoices();
   const zh = vs.filter(v => v.lang.toLowerCase().startsWith("zh"));
   const en = vs.filter(v => v.lang.toLowerCase().startsWith("en"));
-  // 优先“本地”语音（远端网络语音每句都要联网，间隔和延迟都大）
-  vZh = zh.find(v => v.localService && v.lang.toLowerCase().startsWith("zh-cn"))
-     || zh.find(v => v.localService) || zh[0] || null;
-  vEn = en.find(v => v.localService && v.lang.toLowerCase().startsWith("en-us"))
-     || en.find(v => v.localService) || en[0] || null;
+  // 打分：本地语音优先（联网语音每句都要联网，起播和衔接都慢），Google 网络语音最后考虑
+  const pick = (list, lang) => {
+    let best = null, bestScore = -1e9;
+    list.forEach(v => {
+      let s = 0;
+      if (v.localService) s += 100;
+      if (v.lang.toLowerCase() === lang) s += 30;
+      else if (v.lang.toLowerCase().startsWith(lang.split("-")[0])) s += 10;
+      if (/google/i.test(v.name) || /google/i.test(v.voiceURI || "")) s -= 60;
+      if (s > bestScore) { bestScore = s; best = v; }
+    });
+    return best;
+  };
+  vZh = pick(zh, "zh-cn");
+  vEn = pick(en, "en-us");
 }
 function speakZhEn(zh, en) {
   if (!soundOn || !("speechSynthesis" in window)) return;
@@ -1685,13 +1700,24 @@ function speakZhEn(zh, en) {
     spkSeq++;
     const my = spkSeq;
     clearTimeout(spkTimer);
-    // cancel() + resume() 一起调：Chrome 里 cancel 后引擎偶发进入 paused/假死状态，
-    // 之后的 speak 会被整体吞掉（表现为“怎么点都没声音”），resume() 负责把它叫醒
-    speechSynthesis.cancel();
-    speechSynthesis.resume();
-    // cancel() 后同一帧 speak() 在 Chrome 里可能被吞掉，推迟一帧更稳
-    spkTimer = setTimeout(() => {
+    // 只有真在播放时才打断。以前每次点击都 cancel+resume，等于让引擎重新初始化，
+    // 换语言时那一下停顿会被放得更大。
+    const busy = speechSynthesis.speaking || speechSynthesis.pending;
+    if (busy) {
+      speechSynthesis.cancel();
+      if (speechSynthesis.paused) speechSynthesis.resume();
+    }
+    const go = () => {
       if (my !== spkSeq) return;
+      if (joinMode && vZh) {
+        // 连读：中文 + 英文合成一句，由一个语音一口气读完，中间没有任何换语音的停顿
+        const u = new SpeechSynthesisUtterance(zh + " " + en);
+        u.lang = "zh-CN"; u.rate = 1.12;
+        u.voice = vZh;
+        u.onstart = () => { if (my === spkSeq) spkStartAt = Date.now(); };
+        speechSynthesis.speak(u);
+        return;
+      }
       const uz = new SpeechSynthesisUtterance(zh);
       uz.lang = "zh-CN"; uz.rate = 1.2;
       if (vZh) uz.voice = vZh;
@@ -1699,10 +1725,12 @@ function speakZhEn(zh, en) {
       const ue = new SpeechSynthesisUtterance(en);
       ue.lang = "en-US"; ue.rate = 1.1;
       if (vEn) ue.voice = vEn;
-      // 同一队列内两句无缝衔接（这是中英文间隔最小的方式，中间不再插任何延迟）
+      // 两句同队列无缝衔接（这是换语音条件下能做到的最小间隔）
       speechSynthesis.speak(uz);
       speechSynthesis.speak(ue);
-    }, 30);
+    };
+    // 只在刚打断过时才需要延后一帧，空闲时立刻出声，省掉固定延迟
+    if (busy) spkTimer = setTimeout(go, 30); else go();
   } catch (e) { /* 朗读失败不影响游戏 */ }
 }
 // 兜底 watchdog：若引擎卡死（一句短语 12 秒还没结束），强制 cancel+resume 复位，
@@ -1905,6 +1933,14 @@ document.getElementById("btnSound").onclick = function () {
   soundOn = !soundOn;
   this.textContent = soundOn ? "🔊 声音开" : "🔇 声音关";
   if (soundOn) setTimeout(() => speakZhEn("声音开", "Sound on"), 300);
+};
+const btnJoin = document.getElementById("btnJoin");
+btnJoin.classList.toggle("on", joinMode);
+btnJoin.onclick = () => {
+  joinMode = !joinMode;
+  localStorage.setItem("ct_join", joinMode ? "1" : "0");
+  btnJoin.classList.toggle("on", joinMode);
+  speakZhEn(joinMode ? "连读开" : "双语音", joinMode ? "Joined" : "Two voices");
 };
 document.getElementById("btnSave").onclick = () => {
   speakZhEn("保存我的画", "Save my picture");
