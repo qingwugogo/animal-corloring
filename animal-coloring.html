@@ -212,7 +212,6 @@
         <button class="tool-btn" id="btnUndo" data-page-node-id="1rV9axtFpKLIn3GccyrKiU">↩️ 撤销</button>
         <button class="tool-btn" id="btnClear" data-page-node-id="eu5eYHp5UZNZ7rCeNRDv9L">🗑️ 全部重来</button>
         <button class="tool-btn" id="btnSound" data-page-node-id="0lDeW4hQ2JaQfEowLJ1EPS">🔊 声音开</button>
-        <button class="tool-btn" id="btnJoin" title="连读：中英文一句读完，中间不停顿">🔗 连读</button>
         <button class="tool-btn" id="btnSave" data-page-node-id="kjbMQ4kifRXBfSb7xBbUMT">💾 保存我的画</button>
       </div>
       <div class="tip" id="tipLine" data-page-node-id="5Tbzp15uUg0Z3TsLrp31nK">选一个颜色，再点图案上想涂的地方吧！ <span class="t-speaker">🔊</span></div>
@@ -1701,7 +1700,86 @@ function loadVoices() {
   vZh = pick(zh, "zh-cn");
   vEn = pick(en, "en-us");
 }
-function speakZhEn(zh, en) {
+// ===== 预生成音频包（不依赖系统语音合成）=====
+// 安卓微信内置浏览器没有可用的语音合成引擎，iPhone 开了静音键语音合成也会哑掉，
+// 所以中文/英文都用预先录好的 mp3，走 Web Audio 播放：微信里能响，静音键也不影响。
+// 文件名 = 短语对的 FNV-1a 哈希（与生成脚本一致），避免中文路径转义问题
+function audioKey(zh, en) {
+  const s = zh + "|" + en;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    h ^= c & 0xff; h = Math.imul(h, 0x01000193);
+    h ^= (c >> 8) & 0xff; h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);
+}
+const clipCache = {}, clipFail = {};
+let clipNodes = [], clipPrefetching = false;
+
+function ensureAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch (e) { return null; }
+  return audioCtx;
+}
+function stopClips() {
+  clipNodes.forEach(n => { try { n.stop(0); } catch (e) {} });
+  clipNodes = [];
+}
+function playClip(buf, delay) {
+  const c = ensureAudio();
+  if (!c || !buf) return 0;
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  src.connect(c.destination);
+  src.start(c.currentTime + (delay || 0));
+  clipNodes.push(src);
+  src.onended = () => { clipNodes = clipNodes.filter(n => n !== src); };
+  return buf.duration;
+}
+function loadClip(zh, en, lang) {
+  const key = audioKey(zh, en) + lang;
+  if (clipCache[key]) return Promise.resolve(clipCache[key]);
+  if (clipFail[key]) return Promise.resolve(null);
+  const c = ensureAudio();
+  if (!c || !window.fetch) { clipFail[key] = 1; return Promise.resolve(null); }
+  return fetch("audio/" + audioKey(zh, en) + "_" + lang + ".mp3")
+    .then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+    .then(b => new Promise((res, rej) => {
+      const p = c.decodeAudioData(b, res, rej);
+      if (p && p.then) p.then(res, rej);
+    }))
+    .then(buf => { clipCache[key] = buf; return buf; })
+    .catch(() => { clipFail[key] = 1; return null; });
+}
+// 后台预取：首次点击后把常用词汇一次性缓存下来，之后点哪儿都是秒出声
+function prefetchClips() {
+  if (clipPrefetching) return;
+  clipPrefetching = true;
+  const list = [];
+  COLORS.forEach(([hex, zh, en]) => list.push([zh, en]));
+  CATS.forEach(c => { list.push([c.label, c.en]); (c.subs || []).forEach(s => list.push([s, SUB_EN[s] || s])); });
+  PICTURES.forEach(p => {
+    const zh = p.name.replace(/^\S+\s*/, "");
+    list.push([zh, PIC_EN[zh] || zh]);
+  });
+  [["涂色乐园", "Coloring Wonderland"], ["橡皮擦", "Eraser"], ["画笔", "Paint brush"],
+   ["撤销", "Undo"], ["全部重来", "Clear all"], ["声音开", "Sound on"], ["声音关", "Sound off"],
+   ["保存我的画", "Save my picture"],
+   ["选一个颜色，再点图案上想涂的地方吧", "Pick a color, then tap the picture to color it"]].forEach(x => list.push(x));
+  let i = 0;
+  const step = () => {
+    if (i >= list.length) return;
+    const [zh, en] = list[i++];
+    loadClip(zh, en, "zh").then(() => loadClip(zh, en, "en")).then(() => setTimeout(step, 40));
+  };
+  step();
+}
+
+// 系统语音合成：只在音频包加载失败时兜底（比如本地直接打开、audio 目录没带上）
+function legacySpeakZhEn(zh, en) {
   if (!soundOn || !("speechSynthesis" in window)) return;
   try {
     spkSeq++;
@@ -1740,6 +1818,39 @@ function speakZhEn(zh, en) {
     if (busy) spkTimer = setTimeout(go, 30); else go();
   } catch (e) { /* 朗读失败不影响游戏 */ }
 }
+// 对外统一入口：优先播预生成音频，缺文件时才回退系统语音合成
+function speakZhEn(zh, en) {
+  if (!soundOn || !zh) return;
+  spkSeq++;
+  const my = spkSeq;
+  stopClips();
+  try {
+    if ("speechSynthesis" in window && (speechSynthesis.speaking || speechSynthesis.pending)) {
+      speechSynthesis.cancel();
+    }
+  } catch (e) {}
+  const c = ensureAudio();
+  if (!c) { legacySpeakZhEn(zh, en); return; }
+
+  const zhKey = audioKey(zh, en) + "zh", enKey = audioKey(zh, en) + "en";
+  const zhBuf = clipCache[zhKey], enBuf = clipCache[enKey];
+
+  if (zhBuf || enBuf) {
+    // 已在缓存里：立刻出声，中间留 0.1s 自然过渡
+    let d = 0.02;
+    if (zhBuf) d += playClip(zhBuf, d) + 0.10;
+    if (enBuf) playClip(enBuf, d);
+    return;
+  }
+  // 首次点击：拉取音频，回来后播；两个都拿不到才退回系统语音
+  Promise.all([loadClip(zh, en, "zh"), loadClip(zh, en, "en")]).then(([a, b]) => {
+    if (my !== spkSeq) return;
+    if (!a && !b) { legacySpeakZhEn(zh, en); return; }
+    let d = 0.02;
+    if (a) d += playClip(a, d) + 0.10;
+    if (b) playClip(b, d);
+  });
+}
 // 兜底 watchdog：若引擎卡死（一句短语 12 秒还没结束），强制 cancel+resume 复位，
 // 下一次点击就能恢复正常发声
 if ("speechSynthesis" in window) {
@@ -1755,12 +1866,14 @@ if ("speechSynthesis" in window) {
     } catch (e) {}
   }, 2000);
 }
-// 首次交互时唤醒音频会话（真实手势内调用，安全且无卡死风险），首句朗读更快出声
+// 首次交互时唤醒音频会话并开始后台预取音频包（必须在真实手势内，否则手机端会拦）
 let _audioWoke = false;
 document.addEventListener("pointerdown", () => {
   if (_audioWoke) return;
   _audioWoke = true;
+  ensureAudio();
   try { speechSynthesis.resume(); } catch (e) {}
+  setTimeout(prefetchClips, 300);
 }, { capture: true });
 
 // 点游戏标题朗读名称
@@ -1942,13 +2055,15 @@ document.getElementById("btnSound").onclick = function () {
   if (soundOn) setTimeout(() => speakZhEn("声音开", "Sound on"), 300);
 };
 const btnJoin = document.getElementById("btnJoin");
-btnJoin.classList.toggle("on", joinMode);
-btnJoin.onclick = () => {
-  joinMode = !joinMode;
-  store.set("ct_join", joinMode ? "1" : "0");
+if (btnJoin) {
   btnJoin.classList.toggle("on", joinMode);
-  speakZhEn(joinMode ? "连读开" : "双语音", joinMode ? "Joined" : "Two voices");
-};
+  btnJoin.onclick = () => {
+    joinMode = !joinMode;
+    store.set("ct_join", joinMode ? "1" : "0");
+    btnJoin.classList.toggle("on", joinMode);
+    speakZhEn(joinMode ? "连读开" : "双语音", joinMode ? "Joined" : "Two voices");
+  };
+}
 document.getElementById("btnSave").onclick = () => {
   speakZhEn("保存我的画", "Save my picture");
   const clone = board.cloneNode(true);
