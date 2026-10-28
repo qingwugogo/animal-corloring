@@ -1770,12 +1770,14 @@ function prefetchClips() {
    ["保存我的画", "Save my picture"],
    ["选一个颜色，再点图案上想涂的地方吧", "Pick a color, then tap the picture to color it"]].forEach(x => list.push(x));
   let i = 0;
-  const step = () => {
+  // 4 路并发：188 个小文件，串行下载要一分多钟，并发后十几秒就能全缓存
+  const worker = () => {
     if (i >= list.length) return;
     const [zh, en] = list[i++];
-    loadClip(zh, en, "zh").then(() => loadClip(zh, en, "en")).then(() => setTimeout(step, 40));
+    Promise.all([loadClip(zh, en, "zh"), loadClip(zh, en, "en")])
+      .then(() => { if (i < list.length) setTimeout(worker, 10); });
   };
-  step();
+  for (let k = 0; k < 4; k++) worker();
 }
 
 // 系统语音合成：只在音频包加载失败时兜底（比如本地直接打开、audio 目录没带上）
