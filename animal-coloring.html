@@ -1744,7 +1744,7 @@ function loadClip(zh, en, lang) {
   if (clipCache[key]) return Promise.resolve(clipCache[key]);
   if (clipFail[key]) return Promise.resolve(null);
   const c = ensureAudio();
-  if (!c || !window.fetch) { clipFail[key] = 1; return Promise.resolve(null); }
+  if (!c || !window.fetch) return Promise.resolve(null);
   return fetch("audio/" + audioKey(zh, en) + "_" + lang + ".mp3")
     .then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
     .then(b => new Promise((res, rej) => {
@@ -2086,6 +2086,9 @@ document.getElementById("btnSave").onclick = () => {
 };
 
 /* ============ 音效 & 特效 ============ */
+// 页面加载后先在后台把发音缓存起来：等孩子真正点下去时就能立刻出声，
+// 音频上下文此时是 suspended 状态，真正播放仍发生在用户手势里（手机不会拦）
+setTimeout(() => { try { prefetchClips(); } catch (e) {} }, 800);
 function popSound() {
   try {
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
